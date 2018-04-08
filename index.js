@@ -180,6 +180,11 @@ class SvgGroup {
     this.bottomEdge = this.topEdge.plus(this.height)
     this.centerX = this.leftEdge.plus(new Expression(this.width).divide(2))
     this.centerY = this.topEdge.plus(new Expression(this.height).divide(2))
+
+    this.topMostChild_ = null
+    this.bottomMostChild_ = null
+    this.leftMostChild_ = null
+    this.rightMostChild_ = null
   }
 
   append (...children) {
@@ -201,12 +206,33 @@ class SvgGroup {
 
   constraints () {
     const result = this.constraints_.slice()
+
+    if (this.topMostChild_) {
+      result.push(new Equation(this.topEdge, this.topMostChild_.topEdge, Strength.medium, 1));
+    }
+    if (this.bottomMostChild_) {
+      result.push(new Equation(this.bottomEdge, this.bottomMostChild_.bottomEdge, Strength.medium, 1));
+    }
+    if (this.leftMostChild_) {
+      result.push(new Equation(this.leftEdge, this.leftMostChild_.leftEdge, Strength.medium, 1));
+    }
+    if (this.rightMostChild_) {
+      result.push(new Equation(this.rightEdge, this.rightMostChild_.rightEdge, Strength.medium, 1));
+    }
+
     for (const child of this.children_) {
-      appendTo(result, [
-        new Inequality(this.leftEdge, LEQ, child.leftEdge, Strength.weak, 1),
-        new Inequality(this.topEdge, LEQ, child.topEdge, Strength.weak, 1),
-        new Inequality(this.rightEdge, GEQ, child.rightEdge, Strength.weak, 1),
-        new Inequality(this.bottomEdge, GEQ, child.bottomEdge, Strength.weak, 1)])
+      if (child !== this.topMostChild_) {
+        result.push(new Inequality(this.topEdge, LEQ, child.topEdge, Strength.weak, 1));
+      }
+      if (child !== this.bottomMostChild_) {
+        result.push(new Inequality(this.bottomEdge, GEQ, child.bottomEdge, Strength.weak, 1));
+      }
+      if (child !== this.leftMostChild_) {
+        result.push(new Inequality(this.leftEdge, LEQ, child.leftEdge, Strength.weak, 1));
+      }
+      if (child !== this.rightMostChild_) {
+        result.push(new Inequality(this.rightEdge, GEQ, child.rightEdge, Strength.weak, 1));
+      }
     }
     return result
   }
@@ -222,12 +248,23 @@ class SvgGroup {
     return this
   }
 
+  distribute (getter) {
+    appendTo(this.constraints_, distribute(this.children_, getter))
+    return this
+  }
+
   spaceHorizontally (distance = 0) {
+    this.leftMostChild_ = this.children_[0]
+    this.rightMostChild_ = this.children_[this.children_.length-1]
+
     appendTo(this.constraints_, spaceHorizontally(this.children_, distance))
     return this
   }
 
   spaceVertically (distance = 0) {
+    this.topMostChild_ = this.children_[0]
+    this.bottomMostChild_ = this.children_[this.children_.length-1]
+
     appendTo(this.constraints_, spaceVertically(this.children_, distance))
     return this
   }
@@ -237,24 +274,24 @@ function fix (...vars) {
   return vars.map((v) => new StayConstraint(v, Strength.weak, 1))
 }
 
-function align (a, b, distance = 0) {
+function align (a, b, distance = 0, strength = Strength.weak) {
   const aExpression = (a instanceof Expression) ? a : new Expression(a)
 
   // a - distance = b => a - b = distance
   const leftSide = aExpression.minus(b)
-  return new Equation(leftSide, distance)
+  return new Equation(leftSide, distance, strength)
 }
 
-function fill (a, b, offsetXOrBoth = 0, offsetY = undefined) {
+function fill (a, b, offsetXOrBoth = 0, offsetY = undefined, strength = Strength.weak) {
   if (offsetY === undefined) {
     offsetY = offsetXOrBoth
   }
 
   return [
-    align(a.topEdge, b.topEdge, -offsetY),
-    align(a.rightEdge, b.rightEdge, offsetXOrBoth),
-    align(a.bottomEdge, b.bottomEdge, offsetY),
-    align(a.leftEdge, b.leftEdge, -offsetXOrBoth),
+    align(a.topEdge, b.topEdge, -offsetY, strength),
+    align(a.rightEdge, b.rightEdge, offsetXOrBoth, strength),
+    align(a.bottomEdge, b.bottomEdge, offsetY, strength),
+    align(a.leftEdge, b.leftEdge, -offsetXOrBoth, strength),
   ]
 }
 
@@ -262,6 +299,26 @@ function alignAll(array, getter) {
   const constraints = []
   for (let i = 1; i < array.length; i++) {
     constraints.push(align(getter(array[i-1]), getter(array[i])))
+  }
+  return constraints
+}
+
+function distribute(array, getter) {
+  const constraints = []
+  const attributes = array.map(getter)
+
+  for (let i = 2; i < attributes.length; i++) {
+    const a = attributes[i-2]
+    const b = attributes[i-1]
+    const c = attributes[i]
+
+    const bExpression = (b instanceof Expression) ? b : new Expression(b)
+    const cExpression = (c instanceof Expression) ? c : new Expression(c)
+
+    const leftSide = bExpression.minus(a)
+    const rightSide = cExpression.minus(b)
+
+    constraints.push(new Equation(leftSide, rightSide))
   }
   return constraints
 }
@@ -307,6 +364,12 @@ const c3 = new SvgGroup(['seven', 'eight more', 'over nine thousand'].map(makeCe
 const group = new SvgGroup([c1, c2, c3])
 svg.append(group)
 
+const r1 = new SvgElement('rect', {width: 200, height: 30, fill: 'red'})
+const r2 = new SvgElement('rect', {width: 300, height: 30, fill: 'lime'})
+const r3 = new SvgElement('rect', {width: 200, height: 30, fill: 'blue'})
+const rectGroup = new SvgGroup([r1, r2, r3])
+svg.append(rectGroup)
+
 svg.constrain(
   fix(text.fontSize, rect.height),
 
@@ -319,6 +382,7 @@ svg.constrain(
 
   align(group.topEdge, rect.bottomEdge, 30),
   align(group.leftEdge, text.leftEdge, 10),
+  fill(column, group, 10),
   c1.fixAll((t) => t.fontSize)
     .alignAll((t) => t.leftEdge)
     .spaceVertically(10)
@@ -335,7 +399,21 @@ svg.constrain(
     .spaceHorizontally(20)
     .constraints(),
 
-  fill(column, group, 10),
+  // TODO: make this automatic for tables
+  align(group.topEdge, c1.topEdge),
+  align(group.bottomEdge, c1.bottomEdge),
+
+  align(r1.topEdge, column.bottomEdge, 20),
+  align(r1.leftEdge, column.leftEdge),
+  align(r3.bottomEdge, svg.bottomEdge, -20),
+  align(r3.rightEdge, column.rightEdge),
+
+  rectGroup
+    .fixAll((r) => r.width)
+    .fixAll((r) => r.height)
+    .distribute((r) => r.centerX)
+    .distribute((r) => r.centerY)
+    .constraints(),
 )
 
 svg.render()
