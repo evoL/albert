@@ -245,12 +245,16 @@ function align (a, b, distance = 0) {
   return new Equation(leftSide, distance)
 }
 
-function fill (a, b, offset = 0) {
+function fill (a, b, offsetXOrBoth = 0, offsetY = undefined) {
+  if (offsetY === undefined) {
+    offsetY = offsetXOrBoth
+  }
+
   return [
-    align(a.topEdge, b.topEdge, offset),
-    align(a.rightEdge, b.rightEdge, -offset),
-    align(a.bottomEdge, b.bottomEdge, -offset),
-    align(a.leftEdge, b.leftEdge, offset),
+    align(a.topEdge, b.topEdge, -offsetY),
+    align(a.rightEdge, b.rightEdge, offsetXOrBoth),
+    align(a.bottomEdge, b.bottomEdge, offsetY),
+    align(a.leftEdge, b.leftEdge, -offsetXOrBoth),
   ]
 }
 
@@ -313,8 +317,8 @@ svg.constrain(
   align(rect.leftEdge, text.leftEdge),
   align(rect.rightEdge, text.rightEdge),
 
-  align(group.topEdge, rect.bottomEdge, 20),
-  align(group.leftEdge, text.leftEdge),
+  align(group.topEdge, rect.bottomEdge, 30),
+  align(group.leftEdge, text.leftEdge, 10),
   c1.fixAll((t) => t.fontSize)
     .alignAll((t) => t.leftEdge)
     .spaceVertically(10)
@@ -331,7 +335,7 @@ svg.constrain(
     .spaceHorizontally(20)
     .constraints(),
 
-  fill(column, group),
+  fill(column, group, 10),
 )
 
 svg.render()
