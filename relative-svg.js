@@ -166,11 +166,17 @@ class SvgText {
 
       const widthRatio = bbox.width / this.fontSize.value
       const heightRatio = bbox.height / this.fontSize.value
+      const leftEdgeRatio = (this.x.value - bbox.x) / this.fontSize.value
+      const topEdgeRatio = (this.y.value - bbox.y) / this.fontSize.value
 
-      this.width = new Expression(this.fontSize).times(new Expression(widthRatio))
-      this.height = new Expression(this.fontSize).times(new Expression(heightRatio))
-      this.leftEdge = new Expression(this.x).minus(new Expression(this.x.value - bbox.x))
-      this.topEdge = new Expression(this.y).minus(new Expression(this.y.value - bbox.y))
+      this.width = new Expression(this.fontSize).times(
+          new Expression(widthRatio))
+      this.height = new Expression(this.fontSize).times(
+          new Expression(heightRatio))
+      this.leftEdge = new Expression(this.x).minus(
+          new Expression(this.fontSize).times(new Expression(leftEdgeRatio)))
+      this.topEdge = new Expression(this.y).minus(
+          new Expression(this.fontSize).times(new Expression(topEdgeRatio)))
       this.rightEdge = this.leftEdge.plus(this.width)
       this.bottomEdge = this.topEdge.plus(this.height)
       this.centerX = this.leftEdge.plus(this.width.divide(2))
