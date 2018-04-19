@@ -260,8 +260,7 @@ class SvgGroup {
   }
 
   fixAll (getter) {
-    appendTo(this.constraints_, this.children_.map(
-      (child) => new StayConstraint(getter(child), Strength.weak, 1)))
+    appendTo(this.constraints_, fixAll(this.children_, getter))
     return this
   }
 
@@ -294,6 +293,10 @@ class SvgGroup {
 
 function fix (...vars) {
   return vars.map((v) => new StayConstraint(v, Strength.weak, 1))
+}
+
+function fixAll(array, getter) {
+  return fix(...array.map(getter))
 }
 
 function align (a, b, distance = 0, strength = Strength.weak) {
@@ -370,6 +373,7 @@ exports.alignAll = alignAll
 exports.distribute = distribute
 exports.fill = fill
 exports.fix = fix
+exports.fixAll = fixAll
 exports.spaceHorizontally = spaceHorizontally
 exports.spaceVertically = spaceVertically
 
