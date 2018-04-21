@@ -226,17 +226,17 @@ class SvgGroup {
     this.attributes_ = attributes
     this.constraints_ = []
 
-    this.x = makeVariable('x', 0)
-    this.y = makeVariable('y', 0)
-    this.width = makeVariable('width', 0)
-    this.height = makeVariable('height', 0)
+    this.leftEdge = makeVariable('group.leftEdge', 0)
+    this.topEdge = makeVariable('group.topEdge', 0)
+    this.rightEdge = makeVariable('group.rightEdge', 0)
+    this.bottomEdge = makeVariable('group.bottomEdge', 0)
 
-    this.leftEdge = new Expression(this.x)
-    this.topEdge = new Expression(this.y)
-    this.rightEdge = this.leftEdge.plus(this.width)
-    this.bottomEdge = this.topEdge.plus(this.height)
-    this.centerX = this.leftEdge.plus(new Expression(this.width).divide(2))
-    this.centerY = this.topEdge.plus(new Expression(this.height).divide(2))
+    this.x = new Expression(this.leftEdge)
+    this.y = new Expression(this.topEdge)
+    this.width = new Expression(this.rightEdge).minus(this.leftEdge)
+    this.height = new Expression(this.bottomEdge).minus(this.topEdge)
+    this.centerX = new Expression(this.leftEdge).plus(this.rightEdge).divide(2)
+    this.centerY = new Expression(this.topEdge).plus(this.bottomEdge).divide(2)
 
     this.topMostChild_ = null
     this.bottomMostChild_ = null
@@ -257,6 +257,12 @@ class SvgGroup {
     for (const child of this.children_) {
       el.appendChild(child.render())
     }
+
+    // For debugging
+    el.setAttributeNS(null, 'data-top-edge', this.topEdge.value)
+    el.setAttributeNS(null, 'data-right-edge', this.rightEdge.value)
+    el.setAttributeNS(null, 'data-bottom-edge', this.bottomEdge.value)
+    el.setAttributeNS(null, 'data-left-edge', this.leftEdge.value)
 
     return el
   }
