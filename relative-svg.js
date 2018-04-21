@@ -310,8 +310,8 @@ class SvgGroup {
     return this
   }
 
-  alignAll (getter) {
-    appendTo(this.constraints_, alignAll(this.children_, getter))
+  alignAll (getter, distance = undefined) {
+    appendTo(this.constraints_, alignAll(this.children_, getter, distance))
     return this
   }
 
