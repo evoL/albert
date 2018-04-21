@@ -1,5 +1,7 @@
 (function(exports) {
 
+const {AbstractVariable, Expression} = c
+
 function castArray (thing) {
   return Array.isArray(thing) ? thing : [thing]
 }
@@ -320,10 +322,21 @@ function fill (a, b, offsetXOrBoth = 0, offsetY = undefined, strength = Strength
   ]
 }
 
-function alignAll(array, getter) {
+function alignAll(array, getter, distance = 0) {
   const constraints = []
+
+  let distanceGetter;
+  if (typeof distance === 'number'
+      || distance instanceof AbstractVariable || distance instanceof Expression) {
+    distanceGetter = () => distance
+  } else if (typeof distance === 'function') {
+    distanceGetter = distance
+  } else {
+    throw new Error('alignAll: distance must be a number, function, variable or expression')
+  }
+
   for (let i = 1; i < array.length; i++) {
-    constraints.push(align(getter(array[i-1]), getter(array[i])))
+    constraints.push(align(getter(array[i-1]), getter(array[i]), distanceGetter(array[i-1])))
   }
   return constraints
 }
