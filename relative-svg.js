@@ -312,6 +312,31 @@ class SvgGroup {
   }
 }
 
+function makeDistanceGetter (distance, method = '') {
+  if (typeof distance === 'number'
+      || distance instanceof AbstractVariable || distance instanceof Expression) {
+    return () => distance
+  } else if (typeof distance === 'function') {
+    return distance
+  } else {
+    const prefix = method.length ? `${method}: ` : ''
+    throw new Error(
+        prefix + 'distance must be a number, function, variable or expression')
+  }
+}
+
+function negative (something) {
+  if (typeof something === 'number') {
+    return -something
+  } else if (something instanceof AbstractVariable) {
+    return new Expression(something).times(-1)
+  } else if (something instanceof Expression) {
+    return something.times(-1)
+  } else {
+    throw new Error('Cannot take negative value of ' + something)
+  }
+}
+
 function eq (a, b) {
   return new Equation(a, b, Strength.weak, 1)
 }
@@ -379,16 +404,7 @@ function fill (a, b, offsetXOrBoth = 0, offsetY = undefined, strength = Strength
 
 function alignAll(array, getter, distance = 0) {
   const constraints = []
-
-  let distanceGetter;
-  if (typeof distance === 'number'
-      || distance instanceof AbstractVariable || distance instanceof Expression) {
-    distanceGetter = () => distance
-  } else if (typeof distance === 'function') {
-    distanceGetter = distance
-  } else {
-    throw new Error('alignAll: distance must be a number, function, variable or expression')
-  }
+  const distanceGetter = makeDistanceGetter(distance, 'alignAll')
 
   for (let i = 1; i < array.length; i++) {
     constraints.push(align(getter(array[i-1]), getter(array[i]), distanceGetter(array[i-1])))
@@ -418,16 +434,26 @@ function distribute(array, getter) {
 
 function spaceHorizontally(array, distance = 0) {
   const constraints = []
+  const distanceGetter = makeDistanceGetter(distance)
   for (let i = 1; i < array.length; i++) {
-    constraints.push(align(array[i-1].rightEdge, array[i].leftEdge, -distance))
+    constraints.push(
+      align(
+        array[i-1].rightEdge,
+        array[i].leftEdge,
+        negative(distanceGetter(array[i-1]))))
   }
   return constraints
 }
 
 function spaceVertically(array, distance = 0) {
   const constraints = []
+  const distanceGetter = makeDistanceGetter(distance)
   for (let i = 1; i < array.length; i++) {
-    constraints.push(align(array[i-1].bottomEdge, array[i].topEdge, -distance))
+    constraints.push(
+      align(
+        array[i-1].bottomEdge,
+        array[i].topEdge,
+        negative(distanceGetter(array[i-1]))))
   }
   return constraints
 }
@@ -448,6 +474,7 @@ exports.geq = geq
 exports.geqAll = geqAll
 exports.leq = leq
 exports.leqAll = leqAll
+exports.negative = negative
 exports.spaceHorizontally = spaceHorizontally
 exports.spaceVertically = spaceVertically
 
