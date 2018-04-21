@@ -29,6 +29,23 @@ function appendTo (destination, source) {
   }
 }
 
+const NAMESPACES = {
+  'xlink': 'http://www.w3.org/1999/xlink',
+  'xml': 'http://www.w3.org/XML/1998/namespace'
+}
+function setAttribute (el, name, value) {
+  const splitName = name.split(':')
+  if (splitName.length > 1) {
+    const namespace = NAMESPACES[splitName[0]]
+    if (!namespace) {
+      throw new Error('No namespace defined for prefix: ' + splitName[0])
+    }
+    return el.setAttributeNS(namespace, splitName[1], value)
+  }
+
+  return el.setAttributeNS(null, name, value)
+}
+
 class Svg {
   constructor (element) {
     this.el_ = element
@@ -93,7 +110,7 @@ class SvgElement {
   render () {
     const el = document.createElementNS('http://www.w3.org/2000/svg', this.tag_)
     for (const [name, value] of Object.entries(this.attributes_)) {
-      el.setAttributeNS(null, name, value)
+      setAttribute(el, name, value)
     }
     for (const child of this.children_) {
       el.appendChild(child.render())
@@ -142,7 +159,7 @@ class SvgText {
   render () {
     const el = document.createElementNS('http://www.w3.org/2000/svg', 'text')
     for (const [name, value] of Object.entries(this.attributes_)) {
-      el.setAttributeNS(null, name, value)
+      setAttribute(el, name, value)
     }
     el.appendChild(document.createTextNode(this.text_))
 
@@ -223,7 +240,7 @@ class SvgGroup {
   render () {
     const el = document.createElementNS('http://www.w3.org/2000/svg', 'g')
     for (const [name, value] of Object.entries(this.attributes_)) {
-      el.setAttributeNS(null, name, value)
+      setAttribute(el, name, value)
     }
     for (const child of this.children_) {
       el.appendChild(child.render())
