@@ -223,7 +223,7 @@ class SvgText {
 class SvgGroup {
   constructor(children = [], attributes = {}) {
     this.children_ = children
-    this.attributes_ = omit(attributes)
+    this.attributes_ = attributes
     this.constraints_ = []
 
     this.x = makeVariable('x', 0)
@@ -338,6 +338,34 @@ class SvgGroup {
 
     appendTo(this.constraints_, spaceVertically(this.children_, distance))
     return this
+  }
+}
+
+class SvgLine {
+  constructor (attributes = {}) {
+    this.attributes_ = omit(attributes, ['x1', 'y1', 'x2', 'y2'])
+
+    this.x1 = makeVariable('x1', attributes.x1)
+    this.y1 = makeVariable('y1', attributes.y1)
+    this.x2 = makeVariable('x2', attributes.x2)
+    this.y2 = makeVariable('y2', attributes.y2)
+
+    this.centerX = new Expression(this.x1).plus(this.x2).divide(2)
+    this.centerY = new Expression(this.y1).plus(this.y2).divide(2)
+  }
+
+  render () {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+    for (const [name, value] of Object.entries(this.attributes_)) {
+      setAttribute(el, name, value)
+    }
+
+    el.setAttributeNS(null, 'x1', this.x1.value)
+    el.setAttributeNS(null, 'y1', this.y1.value)
+    el.setAttributeNS(null, 'x2', this.x2.value)
+    el.setAttributeNS(null, 'y2', this.y2.value)
+
+    return el
   }
 }
 
@@ -493,6 +521,7 @@ exports.SvgText = SvgText
 exports.SvgGroup = SvgGroup
 exports.SvgRect = SvgRect
 exports.SvgImage = SvgImage
+exports.SvgLine = SvgLine
 exports.align = align
 exports.alignAll = alignAll
 exports.distribute = distribute
