@@ -125,6 +125,18 @@ class SvgElement {
   }
 }
 
+class SvgRect extends SvgElement {
+  constructor(attributes = {}) {
+    super('rect', attributes)
+  }
+}
+
+class SvgImage extends SvgElement {
+  constructor(href, attributes = {}) {
+    super('image', Object.assign({'xlink:href': href}, attributes))
+  }
+}
+
 class SvgText {
   constructor (text, attributes = {}) {
     this.text_ = text
@@ -479,6 +491,8 @@ exports.Svg = Svg
 exports.SvgElement = SvgElement
 exports.SvgText = SvgText
 exports.SvgGroup = SvgGroup
+exports.SvgRect = SvgRect
+exports.SvgImage = SvgImage
 exports.align = align
 exports.alignAll = alignAll
 exports.distribute = distribute
