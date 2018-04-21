@@ -409,6 +409,28 @@ function point(p = undefined, y = undefined) {
   return new SvgPoint(0, 0)
 }
 
+function between(a, b, percentage) {
+  const ax = (a.x instanceof Expression) ? a.x : new Expression(a.x)
+  const ay = (a.y instanceof Expression) ? a.y : new Expression(a.y)
+  const bx = (b.x instanceof Expression) ? b.x : new Expression(b.x)
+  const by = (b.y instanceof Expression) ? b.y : new Expression(b.y)
+
+  return {
+    x: ax.plus(bx.minus(ax).times(percentage)),
+    y: ay.plus(by.minus(ay).times(percentage))
+  }
+}
+
+function center(a, b) {
+  const ax = (a.x instanceof Expression) ? a.x : new Expression(a.x)
+  const ay = (a.y instanceof Expression) ? a.y : new Expression(a.y)
+
+  return {
+    x: ax.plus(b.x).divide(2),
+    y: ay.plus(b.y).divide(2)
+  }
+}
+
 function op (name, point = undefined) {
   return {name, point}
 }
@@ -613,6 +635,8 @@ exports.SvgLine = SvgLine
 exports.SvgPath = SvgPath
 exports.align = align
 exports.alignAll = alignAll
+exports.between = between
+exports.center = center
 exports.distribute = distribute
 exports.eq = eq
 exports.eqAll = eqAll
