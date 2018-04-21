@@ -369,6 +369,83 @@ class SvgLine {
   }
 }
 
+class SvgPoint {
+  constructor (x, y) {
+    this.x_ = (x instanceof AbstractVariable) ? x : makeVariable('point.x', x)
+    this.y_ = (y instanceof AbstractVariable) ? y : makeVariable('point.y', y)
+
+    this.x = new Expression(this.x_)
+    this.y = new Expression(this.y_)
+  }
+
+  static fromPair([x, y]) {
+    return new SvgPoint(x, y)
+  }
+
+  toString() {
+    return `${this.x_.value},${this.y_.value}`
+  }
+}
+
+function point(p = undefined, y = undefined) {
+  if (p instanceof SvgPoint) {
+    return p
+  }
+  if (Array.isArray(p)) {
+    return SvgPoint.fromPair(p)
+  }
+  if ((typeof p === 'number' || p instanceof AbstractVariable)
+      && y !== undefined) {
+    return new SvgPoint(p, y)
+  }
+  return new SvgPoint(0, 0)
+}
+
+function op (name, point = undefined) {
+  return {name, point}
+}
+
+class SvgPath {
+  constructor (attributes = {}) {
+    this.attributes_ = omit(attributes, ['d'])
+    this.operations_ = []
+  }
+
+  moveTo(xOrPoint, y = undefined) {
+    const p = point(xOrPoint, y)
+    this.operations_.push(op('M', p))
+    return this
+  }
+
+  lineTo(xOrPoint, y = undefined) {
+    const p = point(xOrPoint, y)
+    this.operations_.push(op('L', p))
+    return this
+  }
+
+  closePath() {
+    this.operations_.push(op('Z'))
+    return this
+  }
+
+  render() {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+    for (const [name, value] of Object.entries(this.attributes_)) {
+      setAttribute(el, name, value)
+    }
+
+    el.setAttributeNS(null, 'd', this.computeDescription_())
+
+    return el
+  }
+
+  computeDescription_() {
+    return this.operations_.map(({name, point}) => {
+      return `${name}${point || ''}`
+    }).join('')
+  }
+}
+
 function makeDistanceGetter (distance, method = '') {
   if (typeof distance === 'number'
       || distance instanceof AbstractVariable || distance instanceof Expression) {
@@ -522,6 +599,7 @@ exports.SvgGroup = SvgGroup
 exports.SvgRect = SvgRect
 exports.SvgImage = SvgImage
 exports.SvgLine = SvgLine
+exports.SvgPath = SvgPath
 exports.align = align
 exports.alignAll = alignAll
 exports.distribute = distribute
@@ -535,6 +613,7 @@ exports.geqAll = geqAll
 exports.leq = leq
 exports.leqAll = leqAll
 exports.negative = negative
+exports.point = point
 exports.spaceHorizontally = spaceHorizontally
 exports.spaceVertically = spaceVertically
 
