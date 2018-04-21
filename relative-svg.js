@@ -275,6 +275,21 @@ class SvgGroup {
     return this
   }
 
+  eqAll (getter) {
+    appendTo(this.constraints_, eqAll(this.children_, getter))
+    return this
+  }
+
+  geqAll (getter) {
+    appendTo(this.constraints_, geqAll(this.children_, getter))
+    return this
+  }
+
+  leqAll (getter) {
+    appendTo(this.constraints_, leqAll(this.children_, getter))
+    return this
+  }
+
   distribute (getter) {
     appendTo(this.constraints_, distribute(this.children_, getter))
     return this
@@ -295,6 +310,42 @@ class SvgGroup {
     appendTo(this.constraints_, spaceVertically(this.children_, distance))
     return this
   }
+}
+
+function eq (a, b) {
+  return new Equation(a, b, Strength.weak, 1)
+}
+
+function eqAll (array, getter) {
+  const constraints = []
+  for (let i = 1; i < array.length; i++) {
+    constraints.push(eq(getter(array[i-1]), getter(array[i])))
+  }
+  return constraints
+}
+
+function leq (a, b) {
+  return new Inequality(a, LEQ, b, Strength.weak, 1)
+}
+
+function leqAll (array, getter) {
+  const constraints = []
+  for (let i = 1; i < array.length; i++) {
+    constraints.push(leq(getter(array[i-1]), getter(array[i])))
+  }
+  return constraints
+}
+
+function geq (a, b) {
+  return new Inequality(a, GEQ, b, Strength.weak, 1)
+}
+
+function geqAll (array, getter) {
+  const constraints = []
+  for (let i = 1; i < array.length; i++) {
+    constraints.push(geq(getter(array[i-1]), getter(array[i])))
+  }
+  return constraints
 }
 
 function fix (...vars) {
@@ -388,9 +439,15 @@ exports.SvgGroup = SvgGroup
 exports.align = align
 exports.alignAll = alignAll
 exports.distribute = distribute
+exports.eq = eq
+exports.eqAll = eqAll
 exports.fill = fill
 exports.fix = fix
 exports.fixAll = fixAll
+exports.geq = geq
+exports.geqAll = geqAll
+exports.leq = leq
+exports.leqAll = leqAll
 exports.spaceHorizontally = spaceHorizontally
 exports.spaceVertically = spaceVertically
 
