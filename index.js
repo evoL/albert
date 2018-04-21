@@ -6,10 +6,10 @@ rootEl.innerHTML = '' // clear the SVG to make hot reload work better
 const svg = new Svg(rootEl)
 
 let rect = [
-  point(svg.leftEdge, svg.topEdge),
-  point(svg.rightEdge, svg.topEdge),
-  point(svg.rightEdge, svg.bottomEdge),
-  point(svg.leftEdge, svg.bottomEdge)]
+  point(svg.x, svg.y),
+  point(svg.width, svg.y),
+  point(svg.width, svg.height),
+  point(svg.x, svg.height)]
 const percentage = 0.1
 
 for (let i = 0; i < 40; i++) {
