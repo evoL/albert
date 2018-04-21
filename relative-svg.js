@@ -305,6 +305,11 @@ class SvgGroup {
     return result
   }
 
+  forEach (constraint) {
+    appendTo(this.constraints_, forEach(this.children_, constraint))
+    return this
+  }
+
   fixAll (getter) {
     appendTo(this.constraints_, fixAll(this.children_, getter))
     return this
@@ -512,6 +517,15 @@ function negative (something) {
   }
 }
 
+function expression (something) {
+  return (something instanceof Expression)
+      ? something : new Expression(something)
+}
+
+function forEach (array, constraint) {
+  return array.map(constraint)
+}
+
 function eq (a, b) {
   if (arePointLike(a, b)) {
     return [eq(a.x, b.x), eq(a.y, b.y)]
@@ -651,9 +665,11 @@ exports.center = center
 exports.distribute = distribute
 exports.eq = eq
 exports.eqAll = eqAll
+exports.expression = expression
 exports.fill = fill
 exports.fix = fix
 exports.fixAll = fixAll
+exports.forEach = forEach
 exports.geq = geq
 exports.geqAll = geqAll
 exports.leq = leq
