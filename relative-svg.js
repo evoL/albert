@@ -53,17 +53,22 @@ class Svg {
     this.children_ = []
 
     const viewBox = element.viewBox.baseVal
-    this.leftEdge = makeVariable('leftEdge', viewBox.x)
-    this.topEdge = makeVariable('topEdge', viewBox.y)
-    this.rightEdge = makeVariable('rightEdge', viewBox.x + viewBox.width)
-    this.bottomEdge = makeVariable('bottomEdge', viewBox.y + viewBox.height)
-    this.centerX = new Expression(-viewBox.width / 2).plus(this.rightEdge)
-    this.centerY = new Expression(-viewBox.height / 2).plus(this.bottomEdge)
+    this.x = makeVariable('x', viewBox.x)
+    this.y = makeVariable('y', viewBox.y)
+    this.width = makeVariable('width', viewBox.width)
+    this.height = makeVariable('height', viewBox.height)
 
-    this.solver_.addStay(this.leftEdge, Strength.required)
-    this.solver_.addStay(this.topEdge, Strength.required)
-    this.solver_.addStay(this.rightEdge, Strength.required)
-    this.solver_.addStay(this.bottomEdge, Strength.required)
+    this.leftEdge = new Expression(this.x)
+    this.topEdge = new Expression(this.y)
+    this.rightEdge = this.leftEdge.plus(this.width)
+    this.bottomEdge = this.topEdge.plus(this.height)
+    this.centerX = this.leftEdge.plus(this.rightEdge).divide(2)
+    this.centerY = this.topEdge.plus(this.bottomEdge).divide(2)
+
+    this.solver_.addStay(this.x, Strength.required)
+    this.solver_.addStay(this.y, Strength.required)
+    this.solver_.addStay(this.width, Strength.required)
+    this.solver_.addStay(this.height, Strength.required)
   }
   append (...children) {
     appendTo(this.children_, children)
