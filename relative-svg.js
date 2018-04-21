@@ -387,6 +387,14 @@ class SvgPoint {
   }
 }
 
+function isPointLike(p) {
+  return p.x && p.y
+}
+
+function arePointLike(...array) {
+  return array.map(isPointLike).every((p) => p)
+}
+
 function point(p = undefined, y = undefined) {
   if (p instanceof SvgPoint) {
     return p
@@ -472,6 +480,9 @@ function negative (something) {
 }
 
 function eq (a, b) {
+  if (arePointLike(a, b)) {
+    return [eq(a.x, b.x), eq(a.y, b.y)]
+  }
   return new Equation(a, b, Strength.weak, 1)
 }
 
