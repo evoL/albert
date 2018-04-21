@@ -135,6 +135,10 @@ class SvgText {
     this.adjustDimensions_()
   }
 
+  lineHeight (multiplier = 1) {
+    return new Expression(this.fontSize).times(multiplier)
+  }
+
   render () {
     const el = document.createElementNS('http://www.w3.org/2000/svg', 'text')
     for (const [name, value] of Object.entries(this.attributes_)) {
