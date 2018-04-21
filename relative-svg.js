@@ -1,6 +1,6 @@
-(function(exports) {
-
-const {AbstractVariable, Expression} = c
+(function(exports, {
+  AbstractVariable, Equation, Expression, GEQ, Inequality, LEQ, StayConstraint,
+  SimplexSolver, Strength, Variable}) {
 
 function castArray (thing) {
   return Array.isArray(thing) ? thing : [thing]
@@ -394,4 +394,4 @@ exports.fixAll = fixAll
 exports.spaceHorizontally = spaceHorizontally
 exports.spaceVertically = spaceVertically
 
-})(window)
+})(window, c)
