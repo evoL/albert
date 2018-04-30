@@ -308,47 +308,123 @@
   }
 
   class SvgFormattedText {
-    constructor(attributes = {}) {
+    constructor(text = "", attributes = {}) {
       this.children = [];
-      this.attributes_ = attributes;
       this.constraints_ = [];
+
+      this.text_ = text;
+      this.slices_ = [
+        {
+          start: 0,
+          end: text.length,
+          attributes
+        }
+      ];
 
       this.width = null;
       this.height = null;
+      this.fontSize = null;
       this.topEdge = null;
       this.rightEdge = null;
       this.bottomEdge = null;
       this.leftEdge = null;
       this.centerX = null;
       this.centerY = null;
+
+      this.recomputeChildren_();
     }
 
     add(text, attributes = {}) {
-      const newText = new SvgText(
-        text,
-        Object.assign({ "xml:space": "preserve" }, attributes)
-      ).setContext(this.attributes_);
+      this.slices_.push({
+        start: this.text_.length,
+        end: this.text_.length + text.length,
+        attributes
+      });
+      this.text_ += text;
 
-      if (this.children.length) {
-        const prevText = last(this.children);
+      this.recomputeChildren_();
+      return this;
+    }
 
-        this.constraints_.push(
-          // Align baselines
-          new Equation(newText.baseline, prevText.baseline, Strength.medium, 1),
-          // Put new text to the right of previous text
-          new Equation(newText.leftEdge, prevText.rightEdge, Strength.medium, 1)
-        );
+    format(start, end, attributes = {}) {
+      const intersection = this.getSliceIntersection_(start, end);
+
+      for (let i = intersection[0]; i <= intersection[1]; i++) {
+        const slice = this.slices_[i];
+
+        if (slice.start >= start && slice.end <= end) {
+          // Slice is fully within our formatting range
+          Object.assign(slice.attributes, attributes);
+          continue;
+        }
+
+        let skip = 0;
+        if (slice.start < start && slice.end > end) {
+          // Our formatting range is fully within the slice
+          const formattedSlice = {
+            start,
+            end,
+            attributes: Object.assign({}, slice.attributes, attributes)
+          };
+          const clonedSlice = Object.assign({}, slice, { start: end });
+
+          slice.end = start;
+
+          this.slices_.splice(i + 1, 0, formattedSlice, clonedSlice);
+          intersection[1] += 2;
+          skip = 2;
+        } else if (slice.start < start) {
+          // Ends of slices intersect
+          const newSlice = {
+            start,
+            end: slice.end,
+            attributes: Object.assign({}, slice.attributes, attributes)
+          };
+
+          slice.end = start;
+          this.slices_.splice(i + 1, 0, newSlice);
+          intersection[1]++;
+          skip = 1;
+        } else if (slice.end > end) {
+          // Starts of slices intersect
+          const newSlice = {
+            start: slice.start,
+            end,
+            attributes: Object.assign({}, slice.attributes, attributes)
+          };
+
+          slice.start = end;
+          this.slices_.splice(i, 0, newSlice);
+          i++;
+        }
+
+        i += skip;
       }
-      this.children.push(newText);
-      this.setupExpressions_();
+
+      this.recomputeChildren_();
+      return this;
+    }
+
+    formatRegexp(regexp, attributes = {}) {
+      if (typeof regexp === "string") {
+        regexp = new RegExp(regexp);
+      }
+
+      let matches;
+      let stop = false;
+      while (!stop && (matches = regexp.exec(this.text_)) !== null) {
+        this.format(
+          matches.index,
+          matches.index + matches[0].length,
+          attributes
+        );
+        stop = !regexp.global;
+      }
       return this;
     }
 
     render() {
       const el = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      for (const [name, value] of Object.entries(this.attributes_)) {
-        setAttribute(el, name, value);
-      }
       for (const child of this.children) {
         el.appendChild(child.render());
       }
@@ -362,6 +438,54 @@
       return this.constraints_;
     }
 
+    getSliceIntersection_(start, end) {
+      let intersectionStart = -1;
+      let intersectionEnd = -1;
+
+      for (let i = 0; i < this.slices_.length; i++) {
+        const slice = this.slices_[i];
+        if (start < slice.end && end >= slice.start) {
+          if (intersectionStart === -1) {
+            intersectionStart = i;
+          }
+          intersectionEnd = i;
+        }
+      }
+      return [intersectionStart, intersectionEnd];
+    }
+
+    recomputeChildren_() {
+      this.children = this.slices_.map(
+        slice =>
+          new SvgText(
+            this.text_.slice(slice.start, slice.end),
+            Object.assign({ "xml:space": "preserve" }, slice.attributes)
+          )
+      );
+
+      this.constraints_ = [];
+      for (let i = 1; i < this.children.length; i++) {
+        const previous = this.children[i - 1];
+        const current = this.children[i];
+
+        this.constraints_.push(
+          // Align baselines
+          new Equation(current.baseline, previous.baseline, Strength.medium, 1),
+          // Put new text to the right of previous text
+          new Equation(
+            current.leftEdge,
+            previous.rightEdge,
+            Strength.medium,
+            1
+          ),
+          // Make font sizes equal
+          new Equation(current.fontSize, previous.fontSize, Strength.medium, 1)
+        );
+      }
+
+      this.setupExpressions_();
+    }
+
     setupExpressions_() {
       if (!this.children.length) {
         return;
@@ -372,6 +496,7 @@
       const bottomMost = maxBy(this.children, child => child.ratios.bottom)
         .bottomEdge;
 
+      this.fontSize = expression(this.children[0].fontSize);
       this.topEdge = expression(topMost);
       this.bottomEdge = expression(bottomMost);
       this.leftEdge = expression(this.children[0].leftEdge);

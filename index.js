@@ -2,9 +2,11 @@ const rootEl = document.getElementById("svg");
 rootEl.innerHTML = ""; // clear the SVG to make hot reload work better
 
 const svg = new Svg(rootEl);
-const fontFamily = 'monospace';
+const fontFamily = "monospace";
 
-const simpleText = new SvgText("Red Green Blue", { "font-family": fontFamily });
+const simpleText = new SvgText("The quick brown fox jumps over the lazy dog", {
+  "font-family": fontFamily
+});
 svg.append(simpleText);
 
 svg.constrain(
@@ -13,22 +15,25 @@ svg.constrain(
   align(simpleText.rightEdge, svg.rightEdge, -20)
 );
 
-const formattedText = new SvgFormattedText({
-  "font-family": fontFamily
-});
+const formattedText = new SvgFormattedText(
+  "The quick brown fox jumps over the lazy dog",
+  {
+    "font-family": fontFamily,
+    fill: "gray"
+  }
+);
 svg.append(formattedText);
 
 formattedText
-  .add("Red ", { fill: "red" })
-  .add("Green ", { fill: "green" })
-  .add("Blue", { fill: "blue" });
+  .formatRegexp("brown", { fill: "lightbrown" })
+  .formatRegexp(/[aeiou]+/g, { fill: "blue" });
 
 svg.constrain(
   align(formattedText.leftEdge, svg.leftEdge, 20),
   align(formattedText.topEdge, svg.centerY, -10),
   align(formattedText.rightEdge, svg.rightEdge, -20),
 
-  formattedText.eqAll(x => x.fontSize).constraints()
+  formattedText.constraints()
 );
 
 svg.render();
