@@ -11,6 +11,57 @@
 </head>
 <body>
   <svg width="400" height="400" viewbox="0 0 400 400" id="svg"></svg>
+  <br>
+  <button id="exportImage">Export PNG</button>
+  <button id="exportSvg">Export SVG</button>
+
+  <script type="text/javascript">
+    (function() {
+
+    function getSource(svg) {
+      const el = svg.cloneNode(true);
+      el.setAttribute('version', '1.1');
+      el.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'http://www.w3.org/2000/svg');
+
+      const serializer = new XMLSerializer();
+      return serializer.serializeToString(el);
+    }
+
+    document.getElementById('exportImage').addEventListener('click', () => {
+      const svg = document.getElementById('svg');
+      const box = svg.viewBox.baseVal;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = box.width;
+      canvas.height = box.height;
+
+      const img = new Image();
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          window.open(url);
+          URL.revokeObjectURL(url);
+        });
+      };
+
+      const data = encodeURIComponent(getSource(svg));
+      img.src = 'data:image/svg+xml,' + data;
+    });
+
+    document.getElementById('exportSvg').addEventListener('click', () => {
+      const svg = document.getElementById('svg');
+      const blob = new Blob([getSource(svg)], {type: 'image/svg+xml'});
+      const url = URL.createObjectURL(blob);
+      window.open(url);
+      URL.revokeObjectURL(url);
+    });
+
+    })();
+  </script>
+
   <script type="text/javascript" src="./c.js"></script>
   <script type="text/javascript" src="./albert.js"></script>
   <script type="text/javascript" src="./index.js"></script>
