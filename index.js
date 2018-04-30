@@ -1,37 +1,34 @@
-const {Equation, Expression, GEQ, Inequality, LEQ, SimplexSolver, StayConstraint, Strength, Variable} = c
+const rootEl = document.getElementById("svg");
+rootEl.innerHTML = ""; // clear the SVG to make hot reload work better
 
-const rootEl = document.getElementById('svg')
-rootEl.innerHTML = '' // clear the SVG to make hot reload work better
+const svg = new Svg(rootEl);
+const fontFamily = 'monospace';
 
-const svg = new Svg(rootEl)
+const simpleText = new SvgText("Red Green Blue", { "font-family": fontFamily });
+svg.append(simpleText);
 
-let rect = [
-  point(svg.x, svg.y),
-  point(svg.width, svg.y),
-  point(svg.width, svg.height),
-  point(svg.x, svg.height)]
-const percentage = 0.1
+svg.constrain(
+  align(simpleText.leftEdge, svg.leftEdge, 20),
+  align(simpleText.bottomEdge, svg.centerY, -10),
+  align(simpleText.rightEdge, svg.rightEdge, -20)
+);
 
-for (let i = 0; i < 40; i++) {
-  const path = new SvgPath({stroke: 'rgba(255, 255, 255, 0.16)', fill: 'rgba(0,0,0,0.08)'})
-  svg.append(path)
+const formattedText = new SvgFormattedText({
+  "font-family": fontFamily
+});
+svg.append(formattedText);
 
-  const newRect = [point(), point(), point(), point()]
-  const c0 = between(rect[0], rect[1], percentage)
-  const c1 = between(rect[1], rect[2], percentage)
-  const c2 = between(rect[2], rect[3], percentage)
-  const c3 = between(rect[3], rect[0], percentage)
+formattedText
+  .add("Red ", { fill: "red" })
+  .add("Green ", { fill: "green" })
+  .add("Blue", { fill: "blue" });
 
-  path.moveTo(newRect[0]).lineTo(newRect[1]).lineTo(newRect[2]).lineTo(newRect[3]).closePath()
+svg.constrain(
+  align(formattedText.leftEdge, svg.leftEdge, 20),
+  align(formattedText.topEdge, svg.centerY, -10),
+  align(formattedText.rightEdge, svg.rightEdge, -20),
 
-  svg.constrain(
-    eq(newRect[0], c0),
-    eq(newRect[1], c1),
-    eq(newRect[2], c2),
-    eq(newRect[3], c3)
-  )
+  formattedText.eqAll(x => x.fontSize).constraints()
+);
 
-  rect = newRect
-}
-
-svg.render()
+svg.render();

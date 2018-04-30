@@ -13,6 +13,10 @@
     Variable
   }
 ) {
+  function identity(x) {
+    return x;
+  }
+
   function castArray(thing) {
     return Array.isArray(thing) ? thing : [thing];
   }
@@ -23,6 +27,36 @@
       delete obj[key];
     }
     return obj;
+  }
+
+  function last(array) {
+    return array[array.length - 1];
+  }
+
+  function minBy(array, getter = identity) {
+    if (!array.length) {
+      return;
+    }
+    let min = array[0];
+    for (let i = 1; i < array.length; i++) {
+      if (getter(array[i]) < getter(min)) {
+        min = array[i];
+      }
+    }
+    return min;
+  }
+
+  function maxBy(array, getter = identity) {
+    if (!array.length) {
+      return;
+    }
+    let max = array[0];
+    for (let i = 1; i < array.length; i++) {
+      if (getter(array[i]) > getter(max)) {
+        max = array[i];
+      }
+    }
+    return max;
   }
 
   let counter = 0;
@@ -55,6 +89,20 @@
     }
 
     return el.setAttributeNS(null, name, value);
+  }
+
+  function withTemporarySvg(el, callback) {
+    const tempSvg = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "svg"
+    );
+    tempSvg.appendChild(el);
+    document.body.appendChild(tempSvg);
+
+    callback(el);
+
+    document.body.removeChild(tempSvg);
+    tempSvg.removeChild(el);
   }
 
   class Svg {
@@ -160,11 +208,19 @@
     constructor(text, attributes = {}) {
       this.text_ = text;
       this.attributes_ = omit(attributes, ["x", "y", "fontSize"]);
+      this.contextAttributes_ = {};
 
       this.x = makeVariable("x", attributes.x);
       this.y = makeVariable("y", attributes.y);
       this.fontSize = makeVariable("fontSize", attributes["font-size"] || 16);
 
+      this.ratios = {
+        width: 0,
+        height: 0,
+        left: 0,
+        top: 0,
+        bottom: 0
+      };
       this.width = null;
       this.height = null;
       this.leftEdge = null;
@@ -181,14 +237,26 @@
     setText(text) {
       this.text_ = text;
       this.adjustDimensions_();
+      return this;
+    }
+
+    setContext(context) {
+      this.contextAttributes_ = context;
+      this.adjustDimensions_();
+      return this;
     }
 
     lineHeight(multiplier = 1) {
       return new Expression(this.fontSize).times(multiplier);
     }
 
-    render() {
+    render(useContext = false) {
       const el = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      if (useContext) {
+        for (const [name, value] of Object.entries(this.contextAttributes_)) {
+          setAttribute(el, name, value);
+        }
+      }
       for (const [name, value] of Object.entries(this.attributes_)) {
         setAttribute(el, name, value);
       }
@@ -201,24 +269,9 @@
       return el;
     }
 
-    withTemporarySvg_(callback) {
-      let el = this.render();
-      const tempSvg = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "svg"
-      );
-      tempSvg.appendChild(el);
-      document.body.appendChild(tempSvg);
-
-      callback.call(this, el);
-
-      document.body.removeChild(tempSvg);
-      tempSvg.removeChild(el);
-      el = null;
-    }
-
     adjustDimensions_() {
-      this.withTemporarySvg_(text => {
+      const el = this.render(true);
+      withTemporarySvg(el, text => {
         const bbox = text.getBBox();
 
         const widthRatio = bbox.width / this.fontSize.value;
@@ -242,7 +295,106 @@
         this.bottomEdge = this.topEdge.plus(this.height);
         this.centerX = this.leftEdge.plus(this.width.divide(2));
         this.centerY = this.topEdge.plus(this.height.divide(2));
+
+        this.ratios = {
+          width: widthRatio,
+          height: heightRatio,
+          left: leftEdgeRatio,
+          top: topEdgeRatio,
+          bottom: (bbox.y + bbox.height - this.y.value) / this.fontSize.value
+        };
       });
+    }
+  }
+
+  class SvgFormattedText {
+    constructor(attributes = {}) {
+      this.children = [];
+      this.attributes_ = attributes;
+      this.constraints_ = [];
+
+      this.width = null;
+      this.height = null;
+      this.topEdge = null;
+      this.rightEdge = null;
+      this.bottomEdge = null;
+      this.leftEdge = null;
+      this.centerX = null;
+      this.centerY = null;
+    }
+
+    add(text, attributes = {}) {
+      const newText = new SvgText(
+        text,
+        Object.assign({ "xml:space": "preserve" }, attributes)
+      ).setContext(this.attributes_);
+
+      if (this.children.length) {
+        const prevText = last(this.children);
+
+        this.constraints_.push(
+          // Align baselines
+          new Equation(newText.baseline, prevText.baseline, Strength.medium, 1),
+          // Put new text to the right of previous text
+          new Equation(newText.leftEdge, prevText.rightEdge, Strength.medium, 1)
+        );
+      }
+      this.children.push(newText);
+      this.setupExpressions_();
+      return this;
+    }
+
+    render() {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      for (const [name, value] of Object.entries(this.attributes_)) {
+        setAttribute(el, name, value);
+      }
+      for (const child of this.children) {
+        el.appendChild(child.render());
+      }
+
+      el.setAttributeNS(null, "data-type", "formatted-text");
+
+      return el;
+    }
+
+    constraints() {
+      return this.constraints_;
+    }
+
+    setupExpressions_() {
+      if (!this.children.length) {
+        return;
+      }
+
+      // Find the top- and bottommost edges based on ratios
+      const topMost = minBy(this.children, child => child.ratios.top).topEdge;
+      const bottomMost = maxBy(this.children, child => child.ratios.bottom)
+        .bottomEdge;
+
+      this.topEdge = expression(topMost);
+      this.bottomEdge = expression(bottomMost);
+      this.leftEdge = expression(this.children[0].leftEdge);
+      this.rightEdge = expression(last(this.children).rightEdge);
+      this.width = this.rightEdge.minus(this.leftEdge);
+      this.height = this.bottomEdge.minus(this.topEdge);
+      this.centerX = this.leftEdge.plus(this.rightEdge).divide(2);
+      this.centerY = this.topEdge.plus(this.bottomEdge).divide(2);
+    }
+
+    forEach(constraint) {
+      appendTo(this.constraints_, forEach(this.children, constraint));
+      return this;
+    }
+
+    fixAll(getter) {
+      appendTo(this.constraints_, fixAll(this.children, getter));
+      return this;
+    }
+
+    eqAll(getter) {
+      appendTo(this.constraints_, eqAll(this.children, getter));
+      return this;
     }
   }
 
@@ -756,6 +908,7 @@
   exports.SvgImage = SvgImage;
   exports.SvgLine = SvgLine;
   exports.SvgPath = SvgPath;
+  exports.SvgFormattedText = SvgFormattedText;
   exports.align = align;
   exports.alignAll = alignAll;
   exports.between = between;
