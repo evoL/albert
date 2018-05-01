@@ -27,6 +27,19 @@
       return serializer.serializeToString(el);
     }
 
+    function download(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 200);
+    }
+
     document.getElementById('exportImage').addEventListener('click', () => {
       const svg = document.getElementById('svg');
       const box = svg.viewBox.baseVal;
@@ -41,9 +54,7 @@
         ctx.drawImage(img, 0, 0);
 
         canvas.toBlob((blob) => {
-          const url = URL.createObjectURL(blob);
-          window.open(url);
-          URL.revokeObjectURL(url);
+          download(blob, 'albert-export.png');
         });
       };
 
@@ -54,9 +65,7 @@
     document.getElementById('exportSvg').addEventListener('click', () => {
       const svg = document.getElementById('svg');
       const blob = new Blob([getSource(svg)], {type: 'image/svg+xml'});
-      const url = URL.createObjectURL(blob);
-      window.open(url);
-      URL.revokeObjectURL(url);
+      download(blob, 'albert-export.svg');
     });
 
     })();
