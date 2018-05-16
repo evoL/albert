@@ -335,6 +335,10 @@
     }
 
     add(text, attributes = {}) {
+      if (!this.text_.length) {
+        this.slices_ = [];
+      }
+
       this.slices_.push({
         start: this.text_.length,
         end: this.text_.length + text.length,
