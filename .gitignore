@@ -1,4 +1,5 @@
 node_modules/
 
-# Parcel
-.cache/
+# Compiled JS
+dist/albert.js
+dist/albert.js.map

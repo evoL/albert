@@ -4,7 +4,7 @@
   const svg = new albert.Svg(rootEl);
   const fontFamily = "monospace";
 
-  const simpleText = new albert.SvgText(
+  const simpleText = new albert.Text(
     "The quick brown fox jumps over the lazy dog",
     {
       "font-family": fontFamily
@@ -21,7 +21,7 @@
     align(simpleText.rightEdge, svg.rightEdge, -20)
   );
 
-  const formattedText = new albert.SvgFormattedText(
+  const formattedText = new albert.FormattedText(
     "The quick brown fox jumps over the lazy dog",
     {
       "font-family": fontFamily,
