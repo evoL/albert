@@ -1,8 +1,10 @@
 {
   "name": "albert",
   "version": "0.1.0",
+  "private": true,
   "description": "Dynamic SVG generation using Cassowary constraints",
   "main": "dist/albert.js",
+  "module": "src/index.js",
   "dependencies": {
     "cassowary": "0.0.2"
   },
