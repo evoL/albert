@@ -1,0 +1,26 @@
+{
+  "name": "albert",
+  "version": "0.1.0",
+  "description": "Dynamic SVG generation using Cassowary constraints",
+  "main": "dist/albert.js",
+  "dependencies": {
+    "cassowary": "0.0.2"
+  },
+  "devDependencies": {
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
+  },
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "svg",
+    "cassowary",
+    "constraints"
+  ],
+  "author": "Rafał Hirsz (rafal@hirsz.co)",
+  "license": "Apache-2.0"
+}
