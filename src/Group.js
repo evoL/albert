@@ -18,7 +18,14 @@ import {
   spaceVertically,
   variable
 } from "./helpers";
-import { appendTo, prependTo, setAttribute } from "./utils";
+import {
+  appendTo,
+  insertAfter,
+  insertAt,
+  insertBefore,
+  prependTo,
+  setAttribute
+} from "./utils";
 
 export default class Group {
   constructor(children = [], attributes = {}) {
@@ -51,6 +58,21 @@ export default class Group {
 
   prepend(...children) {
     prependTo(this.children_, children);
+    return this;
+  }
+
+  insertAt(index, ...children) {
+    insertAt(this.children_, index, children);
+    return this;
+  }
+
+  insertBefore(child, ...children) {
+    insertBefore(this.children_, child, children);
+    return this;
+  }
+
+  insertAfter(child, ...children) {
+    insertAfter(this.children_, child, children);
     return this;
   }
 

@@ -61,6 +61,28 @@ export function prependTo(destination, source) {
   }
 }
 
+export function insertAt(destination, index, source) {
+  destination.splice(index, 0, ...source);
+}
+
+export function insertBefore(destination, element, source) {
+  const index = destination.indexOf(element);
+  if (index < 0) {
+    throw new Error("Element is not present in the destination array");
+  }
+
+  insertAt(destination, index, source);
+}
+
+export function insertAfter(destination, element, source) {
+  const index = destination.indexOf(element);
+  if (index < 0) {
+    throw new Error("Element is not present in the destination array");
+  }
+
+  insertAt(destination, index + 1, source);
+}
+
 const NAMESPACES = {
   xlink: "http://www.w3.org/1999/xlink",
   xml: "http://www.w3.org/XML/1998/namespace"

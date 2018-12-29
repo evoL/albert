@@ -1,5 +1,13 @@
 import { Expression } from "cassowary";
-import { appendTo, omit, prependTo, setAttribute } from "./utils";
+import {
+  appendTo,
+  insertAfter,
+  insertAt,
+  insertBefore,
+  omit,
+  prependTo,
+  setAttribute
+} from "./utils";
 import { variable } from "./helpers";
 
 export default class Element {
@@ -28,6 +36,18 @@ export default class Element {
   }
   prepend(...children) {
     prependTo(this.children_, children);
+    return this;
+  }
+  insertAt(index, ...children) {
+    insertAt(this.children_, index, children);
+    return this;
+  }
+  insertBefore(child, ...children) {
+    insertBefore(this.children_, child, children);
+    return this;
+  }
+  insertAfter(child, ...children) {
+    insertAfter(this.children_, child, children);
     return this;
   }
   render() {

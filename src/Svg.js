@@ -1,5 +1,12 @@
 import { Expression, SimplexSolver, Strength } from "cassowary";
-import { appendTo, castArray, prependTo } from "./utils";
+import {
+  appendTo,
+  castArray,
+  insertAfter,
+  insertAt,
+  insertBefore,
+  prependTo
+} from "./utils";
 import { variable } from "./helpers";
 
 export default class Svg {
@@ -32,6 +39,18 @@ export default class Svg {
   }
   prepend(...children) {
     prependTo(this.children_, children);
+    return this;
+  }
+  insertAt(index, ...children) {
+    insertAt(this.children_, index, children);
+    return this;
+  }
+  insertBefore(child, ...children) {
+    insertBefore(this.children_, child, children);
+    return this;
+  }
+  insertAfter(child, ...children) {
+    insertAfter(this.children_, child, children);
     return this;
   }
   constrain(...constraints) {
