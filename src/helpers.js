@@ -10,7 +10,13 @@ import {
   Strength,
   Variable
 } from "cassowary";
-import { arePointLike, uniqueId } from "./utils";
+import {
+  arePointLike,
+  castArray,
+  identity,
+  isPointLike,
+  uniqueId
+} from "./utils";
 
 export function expression(something) {
   return something instanceof Expression
@@ -90,7 +96,11 @@ export function negative(something) {
 }
 
 export function forEach(array, constraint) {
-  return array.map(constraint);
+  return array.reduce(
+    (result, item, index, arr) =>
+      result.concat(castArray(constraint(item, index, arr))),
+    []
+  );
 }
 
 export function eq(a, b) {
@@ -132,15 +142,37 @@ export function geqAll(array, getter) {
   return constraints;
 }
 
-export function fix(...vars) {
-  return vars.map(v => new StayConstraint(v, Strength.weak, 1));
+function makeStay(variable) {
+  return new StayConstraint(variable, Strength.weak, 1);
 }
 
-export function fixAll(array, getter) {
+export function fix(...vars) {
+  return vars.reduce(
+    (constraints, variable) =>
+      constraints.concat(
+        variable instanceof Point
+          ? [makeStay(variable.x_), makeStay(variable.y_)]
+          : [makeStay(variable)]
+      ),
+    []
+  );
+}
+
+export function fixAll(array, getter = identity) {
   return fix(...array.map(getter));
 }
 
 export function align(a, b, distance = 0, strength = Strength.weak) {
+  if (arePointLike(a, b)) {
+    const distanceObj = isPointLike(distance)
+      ? distance
+      : { x: distance, y: distance };
+    return [
+      align(a.x, b.x, distanceObj.x, strength),
+      align(a.y, b.y, distanceObj.y, strength)
+    ];
+  }
+
   const aExpression = expression(a);
 
   // a - distance = b => a - b = distance
