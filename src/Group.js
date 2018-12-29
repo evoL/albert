@@ -18,7 +18,7 @@ import {
   spaceVertically,
   variable
 } from "./helpers";
-import { appendTo, setAttribute } from "./utils";
+import { appendTo, prependTo, setAttribute } from "./utils";
 
 export default class Group {
   constructor(children = [], attributes = {}) {
@@ -46,6 +46,11 @@ export default class Group {
 
   append(...children) {
     appendTo(this.children_, children);
+    return this;
+  }
+
+  prepend(...children) {
+    prependTo(this.children_, children);
     return this;
   }
 

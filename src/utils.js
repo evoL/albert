@@ -55,6 +55,12 @@ export function appendTo(destination, source) {
   }
 }
 
+export function prependTo(destination, source) {
+  for (const x of source) {
+    destination.unshift(x);
+  }
+}
+
 const NAMESPACES = {
   xlink: "http://www.w3.org/1999/xlink",
   xml: "http://www.w3.org/XML/1998/namespace"

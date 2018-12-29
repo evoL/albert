@@ -1,5 +1,5 @@
 import { Expression } from "cassowary";
-import { appendTo, omit, setAttribute } from "./utils";
+import { appendTo, omit, prependTo, setAttribute } from "./utils";
 import { variable } from "./helpers";
 
 export default class Element {
@@ -24,6 +24,10 @@ export default class Element {
   }
   append(...children) {
     appendTo(this.children_, children);
+    return this;
+  }
+  prepend(...children) {
+    prependTo(this.children_, children);
     return this;
   }
   render() {
