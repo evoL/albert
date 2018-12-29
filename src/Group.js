@@ -1,4 +1,11 @@
-import { Equation, Expression, Inequality } from "cassowary";
+import {
+  Equation,
+  Expression,
+  GEQ,
+  LEQ,
+  Strength,
+  Inequality
+} from "cassowary";
 import {
   alignAll,
   distribute,
