@@ -1,4 +1,4 @@
-import { omit, setAttribute } from "./utils";
+import { isPointLike, omit, setAttribute } from "./utils";
 import { point } from "./helpers";
 
 function op(name, point = undefined) {
@@ -9,6 +9,28 @@ export default class Path {
   constructor(attributes = {}) {
     this.attributes_ = omit(attributes, ["d"]);
     this.operations_ = [];
+  }
+
+  clone() {
+    const deepCopy = new Path(this.attributes_);
+    const pointMap = new Map();
+
+    deepCopy.operations_ = this.operations_.map(({ name, point }) => {
+      if (point) {
+        if (!pointMap.has(point)) {
+          pointMap.set(point, point.clone());
+        }
+        return op(name, pointMap.get(point));
+      } else {
+        return op(name);
+      }
+    });
+    return deepCopy;
+  }
+
+  setAttributes(attributes) {
+    Object.assign(this.attributes_, omit(attributes, ["d"]));
+    return this;
   }
 
   moveTo(xOrPoint, y = undefined) {
@@ -26,6 +48,12 @@ export default class Path {
   closePath() {
     this.operations_.push(op("Z"));
     return this;
+  }
+
+  points() {
+    const result = new Set(this.operations_.map(o => o.point));
+    result.delete(undefined);
+    return Array.from(result);
   }
 
   render() {
