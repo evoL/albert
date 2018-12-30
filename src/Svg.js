@@ -2,6 +2,7 @@ import { Expression, SimplexSolver, Strength } from "cassowary";
 import {
   appendTo,
   castArray,
+  createElement,
   insertAfter,
   insertAt,
   insertBefore,
@@ -14,6 +15,7 @@ export default class Svg {
     this.el_ = element;
     this.solver_ = new SimplexSolver();
     this.children_ = [];
+    this.defs_ = [];
 
     const viewBox = element.viewBox.baseVal;
     this.x = variable("x", viewBox.x);
@@ -53,6 +55,10 @@ export default class Svg {
     insertAfter(this.children_, child, children);
     return this;
   }
+  addDefs(...defs) {
+    appendTo(this.defs_, defs);
+    return this;
+  }
   constrain(...constraints) {
     for (const constraint of constraints) {
       castArray(constraint).forEach(c => this.solver_.addConstraint(c));
@@ -60,9 +66,20 @@ export default class Svg {
     return this;
   }
   render() {
+    if (this.defs_.length) {
+      this.renderDefs_();
+    }
+
     for (const child of this.children_) {
       this.el_.appendChild(child.render());
     }
     return this;
+  }
+  renderDefs_() {
+    const defs = createElement("defs");
+    for (const def of this.defs_) {
+      defs.appendChild(def.render());
+    }
+    this.el_.appendChild(defs);
   }
 }
