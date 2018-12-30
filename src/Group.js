@@ -20,11 +20,11 @@ import {
 } from "./helpers";
 import {
   appendTo,
+  createElement,
   insertAfter,
   insertAt,
   insertBefore,
-  prependTo,
-  setAttribute
+  prependTo
 } from "./utils";
 
 export default class Group {
@@ -82,10 +82,7 @@ export default class Group {
   }
 
   render() {
-    const el = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    for (const [name, value] of Object.entries(this.attributes_)) {
-      setAttribute(el, name, value);
-    }
+    const el = createElement("g", this.attributes_);
     for (const child of this.children_) {
       el.appendChild(child.render());
     }

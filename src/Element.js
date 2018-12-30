@@ -1,12 +1,12 @@
 import { Expression } from "cassowary";
 import {
   appendTo,
+  createElement,
   insertAfter,
   insertAt,
   insertBefore,
   omit,
-  prependTo,
-  setAttribute
+  prependTo
 } from "./utils";
 import { variable } from "./helpers";
 
@@ -51,13 +51,7 @@ export default class Element {
     return this;
   }
   render() {
-    const el = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      this.tag_
-    );
-    for (const [name, value] of Object.entries(this.attributes_)) {
-      setAttribute(el, name, value);
-    }
+    const el = createElement(this.tag_, this.attributes_);
     for (const child of this.children_) {
       el.appendChild(child.render());
     }

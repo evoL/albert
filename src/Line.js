@@ -1,5 +1,5 @@
 import { Expression } from "cassowary";
-import { omit, setAttribute } from "./utils";
+import { createElement, omit } from "./utils";
 import { variable } from "./helpers";
 
 export default class Line {
@@ -16,10 +16,7 @@ export default class Line {
   }
 
   render() {
-    const el = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    for (const [name, value] of Object.entries(this.attributes_)) {
-      setAttribute(el, name, value);
-    }
+    const el = createElement("line", this.attributes_);
 
     el.setAttributeNS(null, "x1", this.x1.value);
     el.setAttributeNS(null, "y1", this.y1.value);

@@ -1,5 +1,5 @@
 import { Expression } from "cassowary";
-import { omit, setAttribute, withTemporarySvg } from "./utils";
+import { createElement, omit, withTemporarySvg } from "./utils";
 import { variable } from "./helpers";
 
 export default class Text {
@@ -49,15 +49,10 @@ export default class Text {
   }
 
   render(useContext = false) {
-    const el = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    if (useContext) {
-      for (const [name, value] of Object.entries(this.contextAttributes_)) {
-        setAttribute(el, name, value);
-      }
-    }
-    for (const [name, value] of Object.entries(this.attributes_)) {
-      setAttribute(el, name, value);
-    }
+    const attributes = useContext
+      ? Object.assign({}, this.contextAttributes_, this.attributes_)
+      : this.attributes_;
+    const el = createElement("text", attributes);
     el.appendChild(document.createTextNode(this.text_));
 
     el.setAttributeNS(null, "x", this.x.value);

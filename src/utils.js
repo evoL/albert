@@ -84,9 +84,19 @@ export function insertAfter(destination, element, source) {
 }
 
 const NAMESPACES = {
+  svg: "http://www.w3.org/2000/svg",
   xlink: "http://www.w3.org/1999/xlink",
   xml: "http://www.w3.org/XML/1998/namespace"
 };
+
+export function createElement(tag, attributes = {}) {
+  const element = document.createElementNS(NAMESPACES.svg, tag);
+  for (const [name, value] of Object.entries(attributes)) {
+    setAttribute(element, name, value);
+  }
+  return element;
+}
+
 export function setAttribute(el, name, value) {
   const splitName = name.split(":");
   if (splitName.length > 1) {
@@ -101,7 +111,7 @@ export function setAttribute(el, name, value) {
 }
 
 export function withTemporarySvg(el, callback) {
-  const tempSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const tempSvg = createElement("svg");
   tempSvg.appendChild(el);
   document.body.appendChild(tempSvg);
 

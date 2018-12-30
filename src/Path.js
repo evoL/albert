@@ -1,4 +1,4 @@
-import { isPointLike, omit, setAttribute } from "./utils";
+import { createElement, isPointLike, omit } from "./utils";
 import { point } from "./helpers";
 
 function op(name, point = undefined) {
@@ -57,10 +57,7 @@ export default class Path {
   }
 
   render() {
-    const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    for (const [name, value] of Object.entries(this.attributes_)) {
-      setAttribute(el, name, value);
-    }
+    const el = createElement("path", this.attributes_);
 
     el.setAttributeNS(null, "d", this.computeDescription_());
 

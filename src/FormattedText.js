@@ -1,6 +1,6 @@
 import Text from "./Text";
 import { Equation, Strength } from "cassowary";
-import { appendTo, minBy, maxBy, last } from "./utils";
+import { appendTo, createElement, minBy, maxBy, last } from "./utils";
 import { expression, eqAll, fixAll, forEach } from "./helpers";
 
 export default class FormattedText {
@@ -120,7 +120,7 @@ export default class FormattedText {
   }
 
   render() {
-    const el = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    const el = createElement("g");
     for (const child of this.children) {
       el.appendChild(child.render());
     }
