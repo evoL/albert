@@ -1,4 +1,5 @@
 export { default as Element } from "./Element";
+export { default as Filter } from "./Filter";
 export { default as FormattedText } from "./FormattedText";
 export { default as Group } from "./Group";
 export { default as Image } from "./Image";
