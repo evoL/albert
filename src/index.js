@@ -1,3 +1,4 @@
+export { default as Circle } from "./Circle";
 export { default as Element } from "./Element";
 export { default as Filter } from "./Filter";
 export { default as FormattedText } from "./FormattedText";
