@@ -28,9 +28,14 @@ import {
 } from "./utils";
 
 export default class Group {
-  constructor(children = [], attributes = {}) {
-    this.children_ = children;
-    this.attributes_ = attributes;
+  constructor(childrenOrAttributes = {}, attributes = {}) {
+    if (Array.isArray(childrenOrAttributes)) {
+      this.children_ = childrenOrAttributes;
+      this.attributes_ = attributes;
+    } else {
+      this.children_ = [];
+      this.attributes_ = childrenOrAttributes;
+    }
     this.constraints_ = [];
 
     this.leftEdge = variable("group.leftEdge", 0);
