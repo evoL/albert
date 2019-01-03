@@ -5,7 +5,7 @@ import { variable } from "./helpers";
 export default class Text {
   constructor(text, attributes = {}) {
     this.text_ = text;
-    this.attributes_ = omit(attributes, ["x", "y", "fontSize"]);
+    this.attributes_ = omit(attributes, ["x", "y", "font-size"]);
     this.contextAttributes_ = {};
 
     this.x = variable("x", attributes.x);
