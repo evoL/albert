@@ -36,6 +36,11 @@ export default class Text {
     this.adjustDimensions_();
   }
 
+  setAttributes(attributes) {
+    Object.assign(this.attributes_, omit(attributes, ["x", "y", "font-size"]));
+    return this;
+  }
+
   setText(text) {
     this.text_ = text;
     this.slices_ = [];
