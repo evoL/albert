@@ -12,9 +12,13 @@ export default class Text {
     this.attributes_ = omit(attributes, ["x", "y", "font-size"]);
     this.slices_ = []; // By default there will be no spans
 
-    this.x = variable("x", attributes.x);
-    this.y = variable("y", attributes.y);
-    this.fontSize = variable("fontSize", attributes["font-size"] || 16);
+    const idPrefix = attributes.id ? attributes.id + ":" : "";
+    this.x = variable(idPrefix + "text.x", attributes.x);
+    this.y = variable(idPrefix + "text.y", attributes.y);
+    this.fontSize = variable(
+      idPrefix + "text.fontSize",
+      attributes["font-size"] || 16
+    );
 
     this.ratios = {
       width: 0,

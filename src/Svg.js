@@ -14,6 +14,7 @@ export default class Svg {
   constructor(element) {
     this.el_ = element;
     this.solver_ = new SimplexSolver();
+    this.constraints_ = [];
     this.children_ = [];
     this.defs_ = [];
 
@@ -61,7 +62,10 @@ export default class Svg {
   }
   constrain(...constraints) {
     for (const constraint of constraints) {
-      castArray(constraint).forEach(c => this.solver_.addConstraint(c));
+      castArray(constraint).forEach(c => {
+        this.constraints_.push(c);
+        this.solver_.addConstraint(c);
+      });
     }
     return this;
   }
@@ -69,11 +73,16 @@ export default class Svg {
     if (this.defs_.length) {
       this.renderDefs_();
     }
-
     for (const child of this.children_) {
       this.el_.appendChild(child.render());
     }
     return this;
+  }
+  getConstraints() {
+    return this.constraints_;
+  }
+  getConstraintDescriptions() {
+    return this.constraints_.map(constraint => constraint.toString());
   }
   renderDefs_() {
     const defs = createElement("defs");

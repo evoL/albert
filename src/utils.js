@@ -45,8 +45,8 @@ export function maxBy(array, getter = identity) {
 }
 
 let counter = 0;
-export function uniqueId(name = "lol") {
-  return `${name}${counter++}`;
+export function uniqueId(name = "unnamed") {
+  return `${name}#${counter++}`;
 }
 
 export function appendTo(destination, source) {

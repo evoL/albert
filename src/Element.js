@@ -16,10 +16,12 @@ export default class Element {
     this.attributes_ = omit(attributes, ["x", "y", "width", "height"]);
     this.children_ = [];
 
-    this.x = variable("x", attributes.x);
-    this.y = variable("y", attributes.y);
-    this.width = variable("width", attributes.width);
-    this.height = variable("height", attributes.height);
+    const idPrefix = attributes.id ? attributes.id + ":" : "";
+
+    this.x = variable(idPrefix + "x", attributes.x);
+    this.y = variable(idPrefix + "y", attributes.y);
+    this.width = variable(idPrefix + "width", attributes.width);
+    this.height = variable(idPrefix + "height", attributes.height);
 
     this.leftEdge = new Expression(this.x);
     this.topEdge = new Expression(this.y);

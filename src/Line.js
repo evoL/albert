@@ -6,10 +6,11 @@ export default class Line {
   constructor(attributes = {}) {
     this.attributes_ = omit(attributes, ["x1", "y1", "x2", "y2"]);
 
-    this.x1 = variable("x1", attributes.x1);
-    this.y1 = variable("y1", attributes.y1);
-    this.x2 = variable("x2", attributes.x2);
-    this.y2 = variable("y2", attributes.y2);
+    const idPrefix = attributes.id ? attributes.id + ":" : "";
+    this.x1 = variable(idPrefix + "line.x1", attributes.x1);
+    this.y1 = variable(idPrefix + "line.y1", attributes.y1);
+    this.x2 = variable(idPrefix + "line.x2", attributes.x2);
+    this.y2 = variable(idPrefix + "line.y2", attributes.y2);
 
     this.centerX = new Expression(this.x1).plus(this.x2).divide(2);
     this.centerY = new Expression(this.y1).plus(this.y2).divide(2);

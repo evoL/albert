@@ -38,10 +38,11 @@ export default class Group {
     }
     this.constraints_ = [];
 
-    this.leftEdge = variable("group.leftEdge", 0);
-    this.topEdge = variable("group.topEdge", 0);
-    this.rightEdge = variable("group.rightEdge", 0);
-    this.bottomEdge = variable("group.bottomEdge", 0);
+    const idPrefix = attributes.id ? attributes.id + ":" : "";
+    this.leftEdge = variable(idPrefix + "group.leftEdge", 0);
+    this.topEdge = variable(idPrefix + "group.topEdge", 0);
+    this.rightEdge = variable(idPrefix + "group.rightEdge", 0);
+    this.bottomEdge = variable(idPrefix + "group.bottomEdge", 0);
 
     this.x = new Expression(this.leftEdge);
     this.y = new Expression(this.topEdge);

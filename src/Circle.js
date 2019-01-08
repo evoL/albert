@@ -5,9 +5,11 @@ export default class Circle {
   constructor(attributes = {}) {
     this.attributes_ = omit(attributes, ["cx", "cy", "r"]);
 
-    this.cx = variable("circle.cx", attributes.cx);
-    this.cy = variable("circle.cy", attributes.cy);
-    this.r = variable("circle.r", attributes.r);
+    const idPrefix = attributes.id ? attributes.id + ":" : "";
+
+    this.cx = variable(idPrefix + "circle.cx", attributes.cx);
+    this.cy = variable(idPrefix + "circle.cy", attributes.cy);
+    this.r = variable(idPrefix + "circle.r", attributes.r);
 
     this.centerX = expression(this.cx);
     this.centerY = expression(this.cy);
