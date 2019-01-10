@@ -122,7 +122,7 @@ export function withTemporarySvg(el, callback) {
 }
 
 export function isPointLike(p) {
-  return p.x && p.y;
+  return p && p.x !== undefined && p.y !== undefined;
 }
 
 export function arePointLike(...array) {
