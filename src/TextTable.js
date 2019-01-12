@@ -265,7 +265,7 @@ export default class TextTable {
   getColumn(x) {
     return new Slice(
       this,
-      this.rows_.reduce((column, row) => column.concat([row[x]]), []),
+      this.column(x),
       { x },
       {
         left: this.columnLeaders_[x].leftEdge,
@@ -300,6 +300,10 @@ export default class TextTable {
 
   lineHeight(multiplier = 1) {
     return new Expression(this.fontSize).times(multiplier);
+  }
+
+  column(x) {
+    return this.rows_.reduce((column, row) => column.concat([row[x]]), []);
   }
 
   *cells() {
@@ -376,18 +380,15 @@ export default class TextTable {
     // Per-column constraints
     const columns = [];
     for (let x = 0; x < this.columnCount_; x++) {
-      const column = this.getColumn(x);
+      const column = this.column(x);
       const leader = this.columnLeaders_[x];
 
       appendTo(
         columns,
-        column
-          .contents()
-          .filter(cell => cell && cell !== leader)
-          .map(cell => {
-            const field = HORIZONTAL_ALIGNMENTS[cell.horizontalAlignment];
-            return eq(leader[field], cell[field]);
-          })
+        column.filter(cell => cell && cell !== leader).map(cell => {
+          const field = HORIZONTAL_ALIGNMENTS[cell.horizontalAlignment];
+          return eq(leader[field], cell[field]);
+        })
       );
     }
 
@@ -465,7 +466,7 @@ export default class TextTable {
       this.tryUpdatingColumnLeader_(x, cell);
     } else if (x !== undefined) {
       // The entire column has changed
-      const column = this.getColumn(x).contents();
+      const column = this.column(x);
       this.columnLeaders_[x] = findColumnLeader(column);
 
       for (let y = 0; y < this.rows_.length; y++) {
@@ -485,7 +486,7 @@ export default class TextTable {
         this.rowLeaders_[y] = findRowLeader(this.rows_[y]);
       }
       for (let x = 0; x < this.columnCount_; x++) {
-        this.columnLeaders_[x] = findColumnLeader(this.getColumn(x).contents());
+        this.columnLeaders_[x] = findColumnLeader(this.column(x));
       }
     }
 
@@ -528,9 +529,7 @@ export default class TextTable {
 
     if (this.columnLeaders_[index] === cell) {
       // The ratio might be invalid, find a new leader just in case
-      this.columnLeaders_[index] = findColumnLeader(
-        this.getColumn(index).contents()
-      );
+      this.columnLeaders_[index] = findColumnLeader(this.column(index));
       return;
     }
 
