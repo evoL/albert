@@ -299,7 +299,7 @@ export default class TextTable {
   }
 
   lineHeight(multiplier = 1) {
-    return new Expression(this.fontSize).times(multiplier);
+    return expression(this.fontSize).times(multiplier);
   }
 
   column(x) {
@@ -361,7 +361,7 @@ export default class TextTable {
       .map(cell => eq(this.fontSize, cell.fontSize));
 
     // The font size should be positive.
-    const positiveFontSize = []; //[geq(this.fontSize, 1)];
+    const positiveFontSize = [geq(this.fontSize, 1)];
 
     // Per-row constraints
     const rows = [];
