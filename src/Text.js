@@ -42,6 +42,11 @@ export default class Text {
 
   setAttributes(attributes) {
     Object.assign(this.attributes_, omit(attributes, ["x", "y", "font-size"]));
+
+    if (Object.keys(attributes).some(attr => attr.startsWith("font"))) {
+      this.adjustDimensions_();
+    }
+
     return this;
   }
 
@@ -125,6 +130,11 @@ export default class Text {
     // Didn't find a slice to merge with:
     // Add a new one at the end.
     this.slices_.push(createSlice(start, end, attributes));
+
+    if (Object.keys(attributes).some(attr => attr.startsWith("font"))) {
+      this.adjustDimensions_();
+    }
+
     return this;
   }
 
