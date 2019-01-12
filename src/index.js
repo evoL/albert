@@ -12,4 +12,5 @@ export { default as RadialGradient } from "./RadialGradient";
 export { default as Rect } from "./Rect";
 export { default as Svg } from "./Svg";
 export { default as Text } from "./Text";
+export { default as TextTable } from "./TextTable";
 export * from "./helpers";
