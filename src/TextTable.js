@@ -396,9 +396,10 @@ export default class TextTable {
     const betweenRows = [];
     for (let y = 1; y < this.rows_.length; y++) {
       betweenRows.push(
-        align(
-          this.rowLeaders_[y].topEdge,
-          this.rowLeaders_[y - 1].bottomEdge,
+        geq(
+          expression(this.rowLeaders_[y].topEdge).minus(
+            this.rowLeaders_[y - 1].bottomEdge
+          ),
           this.spacing_.y
         )
       );
@@ -408,9 +409,10 @@ export default class TextTable {
     const betweenColumns = [];
     for (let x = 1; x < this.columnCount_; x++) {
       betweenColumns.push(
-        align(
-          this.columnLeaders_[x].leftEdge,
-          this.columnLeaders_[x - 1].rightEdge,
+        geq(
+          expression(this.columnLeaders_[x].leftEdge).minus(
+            this.columnLeaders_[x - 1].rightEdge
+          ),
           this.spacing_.x
         )
       );
