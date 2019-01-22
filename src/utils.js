@@ -8,7 +8,7 @@ export function castArray(thing) {
 
 export function omit(object, keys) {
   const obj = Object.assign({}, object);
-  for (const key in keys) {
+  for (const key of keys) {
     delete obj[key];
   }
   return obj;
