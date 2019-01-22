@@ -1,3 +1,4 @@
+export { default as BasicElement } from "./BasicElement";
 export { default as Circle } from "./Circle";
 export { default as Element } from "./Element";
 export { default as Filter } from "./Filter";

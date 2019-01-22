@@ -1,20 +1,11 @@
+import BasicElement from "./BasicElement";
 import { Expression } from "cassowary";
-import {
-  appendTo,
-  createElement,
-  insertAfter,
-  insertAt,
-  insertBefore,
-  omit,
-  prependTo
-} from "./utils";
+import { omit } from "./utils";
 import { variable } from "./helpers";
 
-export default class Element {
+export default class Element extends BasicElement {
   constructor(tag, attributes = {}) {
-    this.tag_ = tag;
-    this.attributes_ = omit(attributes, ["x", "y", "width", "height"]);
-    this.children_ = [];
+    super(tag, omit(attributes, ["x", "y", "width", "height"]));
 
     const idPrefix = attributes.id ? attributes.id + ":" : "";
 
@@ -32,31 +23,8 @@ export default class Element {
 
     // TODO: add more
   }
-  append(...children) {
-    appendTo(this.children_, children);
-    return this;
-  }
-  prepend(...children) {
-    prependTo(this.children_, children);
-    return this;
-  }
-  insertAt(index, ...children) {
-    insertAt(this.children_, index, children);
-    return this;
-  }
-  insertBefore(child, ...children) {
-    insertBefore(this.children_, child, children);
-    return this;
-  }
-  insertAfter(child, ...children) {
-    insertAfter(this.children_, child, children);
-    return this;
-  }
   render() {
-    const el = createElement(this.tag_, this.attributes_);
-    for (const child of this.children_) {
-      el.appendChild(child.render());
-    }
+    const el = super.render();
 
     el.setAttributeNS(null, "x", this.x.value);
     el.setAttributeNS(null, "y", this.y.value);
