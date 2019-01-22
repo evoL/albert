@@ -211,17 +211,22 @@ export default class TextTable {
 
     const rowCount = this.rows_.length;
     for (let y = 0; y < column.length; y++) {
+      const string = column[y];
       if (y < rowCount) {
-        this.rows_[y][insertionIndex] = this.createCell_(column[y], {
-          x: insertionIndex,
-          y
-        });
+        this.rows_[y][insertionIndex] =
+          string &&
+          this.createCell_(string, {
+            x: insertionIndex,
+            y
+          });
       } else {
         const row = new Array(this.columnCount_);
-        row[insertionIndex] = this.createCell_(column[y], {
-          x: insertionIndex,
-          y
-        });
+        row[insertionIndex] =
+          string &&
+          this.createCell_(string, {
+            x: insertionIndex,
+            y
+          });
         this.rows_.push(row);
       }
     }
