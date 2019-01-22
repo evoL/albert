@@ -198,9 +198,7 @@ export default class TextTable {
     }
 
     const y = this.rows_.length;
-    this.rows_.push(
-      row.map((string, x) => string && this.createCell_(string, { x, y }))
-    );
+    this.rows_.push(row.map((string, x) => this.createCell_(string, { x, y })));
     this.updateLeaders({ y });
     return this;
   }
@@ -213,20 +211,16 @@ export default class TextTable {
     for (let y = 0; y < column.length; y++) {
       const string = column[y];
       if (y < rowCount) {
-        this.rows_[y][insertionIndex] =
-          string &&
-          this.createCell_(string, {
-            x: insertionIndex,
-            y
-          });
+        this.rows_[y][insertionIndex] = this.createCell_(string, {
+          x: insertionIndex,
+          y
+        });
       } else {
         const row = new Array(this.columnCount_);
-        row[insertionIndex] =
-          string &&
-          this.createCell_(string, {
-            x: insertionIndex,
-            y
-          });
+        row[insertionIndex] = this.createCell_(string, {
+          x: insertionIndex,
+          y
+        });
         this.rows_.push(row);
       }
     }
@@ -433,6 +427,10 @@ export default class TextTable {
   }
 
   createCell_(string, position) {
+    if (string == null) {
+      return undefined;
+    }
+
     return new Cell(
       this,
       string,
