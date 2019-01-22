@@ -1,11 +1,15 @@
-import { createElement } from "./utils";
+import { createElement, omit } from "./utils";
 
-function createFilterNode(tag, attributes = {}) {
-  return { tag, attributes };
+function createFilterNode(tag, attributes = {}, children = []) {
+  return { tag, attributes, children };
 }
 
-function renderFilterNode({ tag, attributes }) {
-  return createElement(tag, attributes);
+function renderFilterNode({ tag, attributes, children }) {
+  const node = createElement(tag, attributes);
+  for (const child of children) {
+    node.appendChild(child);
+  }
+  return node;
 }
 
 export default class Filter {
@@ -24,6 +28,53 @@ export default class Filter {
   addOffset(x, y, attributes = {}) {
     const allAttributes = Object.assign({ dx: x, dy: y }, attributes);
     this.filters_.push(createFilterNode("feOffset", allAttributes));
+    return this;
+  }
+
+  addFlood(color, opacityOrAttributes = {}, attributes = {}) {
+    const floodAttributes = { "flood-color": color };
+    if (typeof opacityOrAttributes === "number") {
+      floodAttributes["flood-opacity"] = opacityOrAttributes;
+    } else {
+      attributes = opacityOrAttributes;
+    }
+    const allAttributes = Object.assign(floodAttributes, attributes);
+    this.filters_.push(createFilterNode("feFlood", allAttributes));
+    return this;
+  }
+
+  addComposite(in1, in2, attributes = {}) {
+    const allAttributes = Object.assign({ in: in1, in2 }, attributes);
+    this.filters_.push(createFilterNode("feComposite", allAttributes));
+    return this;
+  }
+
+  addColorMatrix(type, valuesOrAttributes = {}, attributes = {}) {
+    const colorMatrixAttributes = { type };
+    if (["string", "number"].includes(typeof valuesOrAttributes)) {
+      colorMatrixAttributes.values = valuesOrAttributes;
+    } else {
+      attributes = valuesOrAttributes;
+    }
+    const allAttributes = Object.assign(colorMatrixAttributes, attributes);
+    this.filters_.push(createFilterNode("feColorMatrix", allAttributes));
+    return this;
+  }
+
+  addComponentTransfer(attributes = {}) {
+    const children = [];
+    const KEYS = ["r", "g", "b", "a"];
+    for (const key of KEYS) {
+      if (!attributes[key]) {
+        continue;
+      }
+      const tag = `feFunc${key.toUpperCase()}`;
+      children.push(createElement(tag, attributes[key]));
+    }
+
+    this.filters_.push(
+      createFilterNode("feComponentTransfer", omit(attributes, KEYS), children)
+    );
     return this;
   }
 
