@@ -25,14 +25,23 @@ import {
 import { variable } from "./helpers";
 
 export default class Svg {
-  constructor(element) {
-    this.el_ = element;
+  constructor(elementOrOptions = null, options = {}) {
+    if (elementOrOptions instanceof Element) {
+      this.el_ = elementOrOptions;
+      this.options_ = options;
+    } else {
+      this.el_ = createElement("svg");
+      this.options_ = elementOrOptions;
+    }
+
+    this.options_ = Object.assign({ allowResize: false }, this.options_);
+
     this.solver_ = new SimplexSolver();
     this.constraints_ = [];
     this.children_ = [];
     this.defs_ = [];
 
-    const viewBox = element.viewBox.baseVal;
+    const viewBox = this.el_.viewBox.baseVal;
     this.x = variable("x", viewBox.x);
     this.y = variable("y", viewBox.y);
     this.width = variable("width", viewBox.width);
@@ -47,8 +56,10 @@ export default class Svg {
 
     this.solver_.addStay(this.x, Strength.required);
     this.solver_.addStay(this.y, Strength.required);
-    this.solver_.addStay(this.width, Strength.required);
-    this.solver_.addStay(this.height, Strength.required);
+    if (!this.options_.allowResize) {
+      this.solver_.addStay(this.width, Strength.required);
+      this.solver_.addStay(this.height, Strength.required);
+    }
   }
   append(...children) {
     appendTo(this.children_, children);
@@ -87,6 +98,15 @@ export default class Svg {
     if (this.defs_.length) {
       this.renderDefs_();
     }
+    if (this.options_.allowResize) {
+      this.el_.setAttributeNS(
+        null,
+        "viewBox",
+        [this.x.value, this.y.value, this.width.value, this.height.value].join(
+          " "
+        )
+      );
+    }
     for (const child of this.children_) {
       this.el_.appendChild(child.render());
     }
@@ -97,6 +117,9 @@ export default class Svg {
   }
   getConstraintDescriptions() {
     return this.constraints_.map(constraint => constraint.toString());
+  }
+  getElement() {
+    return this.el_;
   }
   renderDefs_() {
     const defs = createElement("defs");
