@@ -12,7 +12,7 @@ To use it in your project, run:
 npm install --save albert-svg
 ```
 
-You can also use the one of the pre-compiled bundles hosted on unpkg:
+You can also use one of the pre-compiled bundles hosted on unpkg:
 
 - https://unpkg.com/albert-svg/dist/albert.js
 - https://unpkg.com/albert-svg/dist/albert.min.js
