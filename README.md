@@ -5,11 +5,19 @@ This project allows you to generate SVGs and layout their elements using the
 
 ## How to use
 
-Examples on how to use Albert are in the [`examples`](https://github.com/evoL/albert/tree/master/examples) directory.
-
-To see them in action, run:
+This project requires [Node](https://nodejs.org) and [NPM](https://www.npmjs.com).
+To use it in your project, run:
 
 ```
+npm install --save albert-svg
+```
+
+Examples on how to use Albert are in the [`examples`](https://github.com/evoL/albert/tree/master/examples) directory.
+
+To see them in action, clone the repository and run:
+
+```
+npm install
 npm start
 ```
 
@@ -18,7 +26,7 @@ directory and the Albert bundle itself.
 
 ## Building a bundle
 
-Building the bundle requires [Webpack](https://webpack.js.org), which in turn requires [Node](https://nodejs.org) and [NPM](https://www.npmjs.com).
+Building the bundle requires [Webpack](https://webpack.js.org), which in turn
 
 If you have Node and NPM installed, build the bundle by running:
 
