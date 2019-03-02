@@ -12,6 +12,11 @@ To use it in your project, run:
 npm install --save albert-svg
 ```
 
+You can also use the one of the pre-compiled bundles hosted on unpkg:
+
+- https://unpkg.com/albert-svg/dist/albert.js
+- https://unpkg.com/albert-svg/dist/albert.min.js
+
 Examples on how to use Albert are in the [`examples`](https://github.com/evoL/albert/tree/master/examples) directory.
 
 To see them in action, clone the repository and run:
