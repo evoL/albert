@@ -34,7 +34,7 @@
     align(simpleText.rightEdge, svg.rightEdge, -20)
   );
 
-  const formattedText = new albert.FormattedText(
+  const formattedText = new albert.Text(
     "The quick brown fox jumps over the lazy dog",
     {
       "font-family": fontFamily,
@@ -50,9 +50,7 @@
   svg.constrain(
     align(formattedText.leftEdge, svg.leftEdge, 20),
     align(formattedText.topEdge, svg.centerY, -10),
-    align(formattedText.rightEdge, svg.rightEdge, -20),
-
-    formattedText.constraints()
+    align(formattedText.rightEdge, svg.rightEdge, -20)
   );
 
   svg.render();
