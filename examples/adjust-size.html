@@ -17,25 +17,26 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Albert Examples</title>
+  <title>Albert Example: Adjusting the SVG size</title>
   <link rel="stylesheet" type="text/css" href="example.css">
 </head>
 <body>
+  <header>
+    <h1>Adjusting the SVG size</h1>
+    <p>
+      Sometimes you want the SVG to adapt to the contents, instead of the other
+      way around. In that case the <code>allowResize</code> option of the
+      <code>Svg</code> class is for you. It will automatically adjust the
+      <code>viewBox</code> of the SVG to fit all your contents.
+    </p>
+  </header>
   <main>
-    <h1>Albert Examples</h1>
-    <ul>
-      <li><a href="adjust-size.html">Adjusting the SVG size</a></li>
-      <li><a href="advanced-filters.html">Advanced SVG filters</a></li>
-      <li><a href="cloning-paths.html">Making shadows by cloning paths</a></li>
-      <li><a href="filters.html">SVG filters</a></li>
-      <li><a href="formatting-text.html">Formatting text</a></li>
-      <li><a href="gradients.html">Gradients</a></li>
-      <li><a href="groups-and-vertical-centering.html">
-        Groups and vertical centering
-      </a></li>
-      <li><a href="paths.html">Paths</a></li>
-      <li><a href="tables.html">Tables</a></li>
-    </ul>
+    <h2>Result</h2>
+    <svg id="svg"></svg>
+    <p><a class="return" href="/">Return to the list of examples</a></p>
   </main>
+
+  <script src="/albert.js"></script>
+  <script src="adjust-size.js"></script>
 </body>
 </html>
