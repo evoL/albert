@@ -5,15 +5,15 @@ This project allows you to generate SVGs and layout their elements using the
 
 ## How to use
 
-Examples on how to use Albert are in the `examples/` directory. Also, take a
-take a look at the `dist/` directory for a basic setup.
+Examples on how to use Albert are in the [`examples`](https://github.com/evoL/albert/tree/master/examples) directory.
 
-To play around, run:
+To see them in action, run:
+
 ```
 npm start
 ```
 
-This starts a web server on http://localhost:8080 that serves the `dist/`
+This starts a web server on http://localhost:8080 that serves the `examples/`
 directory and the Albert bundle itself.
 
 ## Building a bundle

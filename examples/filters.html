@@ -1,0 +1,53 @@
+<!--
+  Copyright 2019 Google LLC
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Albert Example: SVG Filters</title>
+  <link rel="stylesheet" type="text/css" href="example.css">
+</head>
+<body>
+  <header>
+    <h1>SVG Filters</h1>
+    <p>
+      Albert can setup SVG filters. Unfortunately, there's no constraint support
+      for filters at the moment.
+    </p>
+    <p>The following filter nodes are supported:</p>
+    <ul>
+      <li>Gaussian blur (<code>feGaussianBlur</code>)</li>
+      <li>offset (<code>feOffset</code>)</li>
+      <li>flood (<code>feFlood</code>)</li>
+      <li>composite nodes (<code>feComposite</code>)</li>
+      <li>color matrix nodes (<code>feColorMatrix</code>)</li>
+      <li>component transfer nodes (<code>feComponentTransfer</code>,
+        <code>feFuncR</code>, <code>feFuncG</code>, <code>feFuncB</code>,
+        <code>feFuncA</code>)</li>
+      <li>merge nodes (<code>feMergeNode</code> and <code>feMerge</code>)</li>
+    </ul>
+    <p>See also <a href="advanced-filters.html">Advanced SVG filters</a>.</p>
+  </header>
+  <main>
+    <h2>Result</h2>
+    <svg viewbox="0 0 200 200" id="svg"></svg>
+    <p><a class="return" href="/">Return to the list of examples</a></p>
+  </main>
+
+  <script src="/albert.js"></script>
+  <script src="filters.js"></script>
+</body>
+</html>

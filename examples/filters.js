@@ -11,19 +11,34 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+(function() {
+  const rootEl = document.getElementById("svg");
 
-const path = require("path");
+  const svg = new albert.Svg(rootEl);
 
-module.exports = {
-  entry: "./src/index.js",
-  output: {
-    filename: "albert.js",
-    path: path.resolve(__dirname, "dist"),
-    library: "albert",
-    libraryTarget: "umd"
-  },
-  devtool: "source-map",
-  devServer: {
-    contentBase: "./examples"
-  }
-};
+  const filter = new albert.Filter({
+    id: "dropshadow",
+    width: 130,
+    height: 130,
+    x: -15,
+    y: -15
+  });
+  filter
+    .addGaussianBlur(5, { in: "SourceAlpha" })
+    .addOffset(2, 2)
+    .addMergeNode()
+    .addMergeNode({ in: "SourceGraphic" });
+  svg.addDefs(filter);
+
+  const rect = new albert.Rect({
+    x: 20,
+    y: 20,
+    width: 100,
+    height: 100,
+    fill: "#00f",
+    filter: "url(#dropshadow)"
+  });
+  svg.append(rect);
+
+  svg.render();
+})();
