@@ -17,26 +17,26 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Albert Examples</title>
+  <title>Albert Example: Points</title>
   <link rel="stylesheet" type="text/css" href="example.css">
 </head>
 <body>
+  <header>
+    <h1>Points</h1>
+    <p>
+      This example generates concentric rectangles by picking points on the
+      edges using a predefined ratio between the points. This illustrates the
+      use of points (e.g. <code>{x: 0, y: 0}</code>) in Albert's classes and
+      helpers, such as <code>Path</code> and <code>eq</code>.
+    </p>
+  </header>
   <main>
-    <h1>Albert Examples</h1>
-    <ul>
-      <li><a href="adjust-size.html">Adjusting the SVG size</a></li>
-      <li><a href="advanced-filters.html">Advanced SVG filters</a></li>
-      <li><a href="cloning-paths.html">Making shadows by cloning paths</a></li>
-      <li><a href="filters.html">SVG filters</a></li>
-      <li><a href="formatting-text.html">Formatting text</a></li>
-      <li><a href="gradients.html">Gradients</a></li>
-      <li><a href="groups-and-vertical-centering.html">
-        Groups and vertical centering
-      </a></li>
-      <li><a href="paths.html">Paths</a></li>
-      <li><a href="points.html">Points</a></li>
-      <li><a href="tables.html">Tables</a></li>
-    </ul>
+    <h2>Result</h2>
+    <svg viewbox="0 0 400 400" id="svg"></svg>
+    <p><a class="return" href="/">Return to the list of examples</a></p>
   </main>
+
+  <script src="/albert.js"></script>
+  <script src="points.js"></script>
 </body>
 </html>
