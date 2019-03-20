@@ -32,6 +32,15 @@ export function last(array) {
   return array[array.length - 1];
 }
 
+export function findLast(array, getter) {
+  for (let i = array.length - 1; i >= 0; i--) {
+    if (getter(array[i])) {
+      return array[i];
+    }
+  }
+  return undefined;
+}
+
 export function minBy(array, getter = identity) {
   if (!array.length) {
     return;

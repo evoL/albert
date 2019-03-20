@@ -13,8 +13,16 @@
 // limitations under the License.
 
 import Text from "./Text";
-import { appendTo, createElement, isPointLike, last, maxBy } from "./utils";
-import { align, eq, expression, geq } from "./helpers";
+import {
+  appendTo,
+  createElement,
+  findLast,
+  identity,
+  isPointLike,
+  last,
+  maxBy
+} from "./utils";
+import { eq, expression, geq } from "./helpers";
 
 const CENTER = "center";
 const HORIZONTAL_ALIGNMENTS = {
@@ -138,6 +146,8 @@ class Slice {
 
   alignTo(one, two) {
     for (const cell of this.cells_) {
+      if (cell === undefined) continue;
+
       cell.alignTo(one, two);
     }
     return this;
@@ -145,6 +155,8 @@ class Slice {
 
   setAttributes(attributes) {
     for (const cell of this.cells_) {
+      if (cell === undefined) continue;
+
       cell.withUpdatesSuppressed(() => {
         cell.setAttributes(attributes);
       });
@@ -156,6 +168,8 @@ class Slice {
 
   format(start, end, attributes) {
     for (const cell of this.cells_) {
+      if (cell === undefined) continue;
+
       cell.withUpdatesSuppressed(() => {
         cell.format(start, end, attributes);
       });
@@ -166,6 +180,8 @@ class Slice {
 
   formatRegexp(regexp, attributes) {
     for (const cell of this.cells_) {
+      if (cell === undefined) continue;
+
       cell.withUpdatesSuppressed(() => {
         cell.formatRegexp(regexp, attributes);
       });
@@ -383,10 +399,12 @@ export default class TextTable {
 
       appendTo(
         rows,
-        row.filter(cell => cell && cell !== leader).map(cell => {
-          const field = VERTICAL_ALIGNMENTS[cell.verticalAlignment];
-          return eq(leader[field], cell[field]);
-        })
+        row
+          .filter(cell => cell && cell !== leader)
+          .map(cell => {
+            const field = VERTICAL_ALIGNMENTS[cell.verticalAlignment];
+            return eq(leader[field], cell[field]);
+          })
       );
     });
 
@@ -398,10 +416,12 @@ export default class TextTable {
 
       appendTo(
         columns,
-        column.filter(cell => cell && cell !== leader).map(cell => {
-          const field = HORIZONTAL_ALIGNMENTS[cell.horizontalAlignment];
-          return eq(leader[field], cell[field]);
-        })
+        column
+          .filter(cell => cell && cell !== leader)
+          .map(cell => {
+            const field = HORIZONTAL_ALIGNMENTS[cell.horizontalAlignment];
+            return eq(leader[field], cell[field]);
+          })
       );
     }
 
@@ -574,12 +594,13 @@ export default class TextTable {
       return;
     }
 
-    const topMostCell = this.rowLeaders_[0];
-    const bottomMostCell = last(this.rowLeaders_);
-    const leftMostCell = this.columnLeaders_[0];
-    const rightMostCell = last(this.columnLeaders_);
+    const topMostCell = this.rowLeaders_.find(identity);
+    const bottomMostCell = findLast(this.rowLeaders_, identity);
+    const leftMostCell = this.columnLeaders_.find(identity);
+    const rightMostCell = findLast(this.columnLeaders_, identity);
+    const firstCell = this.cells().next().value;
 
-    this.fontSize = expression(this.getCell(0, 0).fontSize);
+    this.fontSize = expression(firstCell.fontSize);
     this.leftEdge = expression(leftMostCell.leftEdge);
     this.topEdge = expression(topMostCell.topEdge);
     this.rightEdge = expression(rightMostCell.rightEdge);
