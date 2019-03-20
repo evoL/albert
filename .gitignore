@@ -1,5 +1,4 @@
 node_modules/
 
 # Compiled JS
-dist/albert.js
-dist/albert.js.map
+dist/

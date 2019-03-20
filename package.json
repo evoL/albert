@@ -15,6 +15,7 @@
   },
   "scripts": {
     "build": "webpack",
+    "build-release": "webpack --mode development && webpack --mode production --output-filename albert.min.js && rm dist/*.map",
     "start": "webpack-dev-server --mode development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
