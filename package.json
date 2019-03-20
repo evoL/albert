@@ -9,6 +9,8 @@
     "cassowary": "0.0.2"
   },
   "devDependencies": {
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.3.4000",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.2.1"
