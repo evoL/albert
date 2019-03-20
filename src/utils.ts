@@ -12,15 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export function identity(x) {
+/** Returns the argument unchanged. */
+export function identity<T>(x: T): T {
   return x;
 }
 
-export function castArray(thing) {
+/**
+ * If the parameter is an array, returns the parameter. Otherwise, wraps the
+ * parameter in an array.
+ */
+export function castArray<T>(thing: T | Array<T>): Array<T> {
   return Array.isArray(thing) ? thing : [thing];
 }
 
-export function omit(object, keys) {
+/** Returns a shallow copy of the object with the passed in keys removed. */
+export function omit<T>(
+  object: { [key: string]: T },
+  keys: Array<keyof object>
+): { [key: string]: T } {
   const obj = Object.assign({}, object);
   for (const key of keys) {
     delete obj[key];
@@ -28,22 +37,31 @@ export function omit(object, keys) {
   return obj;
 }
 
-export function last(array) {
+/** Returns the last element of the array. */
+export function last<T>(array: Array<T>): T {
   return array[array.length - 1];
 }
 
-export function findLast(array, getter) {
+/** Finds the last element matching the predicate. */
+export function findLast<T>(
+  array: Array<T>,
+  predicate: (item: T) => boolean
+): T | undefined {
   for (let i = array.length - 1; i >= 0; i--) {
-    if (getter(array[i])) {
+    if (predicate(array[i])) {
       return array[i];
     }
   }
   return undefined;
 }
 
-export function minBy(array, getter = identity) {
+/** Returns the minimum element of the array as determined by the getter. */
+export function minBy<T>(
+  array: Array<T>,
+  getter: (item: T) => {} = identity
+): T | undefined {
   if (!array.length) {
-    return;
+    return undefined;
   }
   let min = array[0];
   for (let i = 1; i < array.length; i++) {
@@ -54,9 +72,13 @@ export function minBy(array, getter = identity) {
   return min;
 }
 
-export function maxBy(array, getter = identity) {
+/** Returns the maximum element of the array as determined by the getter. */
+export function maxBy<T>(
+  array: Array<T>,
+  getter: (item: T) => {} = identity
+): T | undefined {
   if (!array.length) {
-    return;
+    return undefined;
   }
   let max = array[0];
   for (let i = 1; i < array.length; i++) {
@@ -68,7 +90,12 @@ export function maxBy(array, getter = identity) {
 }
 
 let counter = 0;
-export function uniqueId(name = "unnamed") {
+/**
+ * Generates a unique ID.
+ *
+ * Accepts an optional name, which will be used as part of the ID.
+ */
+export function uniqueId(name: string = "unnamed"): string {
   return `${name}#${counter++}`;
 }
 
