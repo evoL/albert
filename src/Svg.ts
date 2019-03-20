@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import EdgeConstrainable from "./EdgeConstrainable";
+import Nestable from "./Nestable";
 import Renderable from "./Renderable";
 import {
   Constraint,
@@ -64,12 +65,11 @@ export interface SvgOptions {
  *
  *   const svg = new Svg({ allowResize: true });
  */
-export default class Svg implements EdgeConstrainable {
+export default class Svg extends Nestable implements EdgeConstrainable {
   private el_: SVGSVGElement;
   private options_: SvgOptions;
   private solver_: SimplexSolver;
   private constraints_: Array<Constraint>;
-  private children_: Array<Renderable>;
   private defs_: Array<Renderable>;
 
   x: Variable;
@@ -87,6 +87,7 @@ export default class Svg implements EdgeConstrainable {
     elementOrOptions: SVGSVGElement | Partial<SvgOptions> | null = null,
     options: Partial<SvgOptions> = {}
   ) {
+    super();
     const { realEl, realOptions } = ((): {
       realEl: SVGSVGElement;
       realOptions: Partial<SvgOptions>;
@@ -128,36 +129,6 @@ export default class Svg implements EdgeConstrainable {
       this.solver_.addStay(this.width, Strength.required);
       this.solver_.addStay(this.height, Strength.required);
     }
-  }
-
-  /** Appends Albert renderables. */
-  append(...children: Array<Renderable>): Svg {
-    appendTo(this.children_, children);
-    return this;
-  }
-
-  /** Prepends Albert renderables. */
-  prepend(...children: Array<Renderable>): Svg {
-    prependTo(this.children_, children);
-    return this;
-  }
-
-  /** Inserts Albert renderables at a specific index. */
-  insertAt(index: number, ...children: Array<Renderable>): Svg {
-    insertAt(this.children_, index, children);
-    return this;
-  }
-
-  /** Inserts Albert renderables before the passed in child. */
-  insertBefore(child: Renderable, ...children: Array<Renderable>): Svg {
-    insertBefore(this.children_, child, children);
-    return this;
-  }
-
-  /** Inserts Albert renderables after the passed in child. */
-  insertAfter(child: Renderable, ...children: Array<Renderable>): Svg {
-    insertAfter(this.children_, child, children);
-    return this;
   }
 
   /** Adds renderables to the <defs> section of the SVG. */

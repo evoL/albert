@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Represents an SVG element within Albert.
- */
-export default interface Renderable {
-  /** Renders the Renderable to a DOM element. */
-  render(): Element;
+export default interface Attributes {
+  [key: string]: string | number;
 }

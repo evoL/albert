@@ -12,41 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  appendTo,
-  createElement,
-  insertAfter,
-  insertAt,
-  insertBefore,
-  prependTo
-} from "./utils";
+import Attributes from "./Attributes";
+import Nestable from "./Nestable";
+import Renderable from "./Renderable";
+import { createElement } from "./utils";
 
-export default class BasicElement {
-  constructor(tag, attributes = {}) {
+/**
+ * Renderable that represents a generic SVG element. Does not include constraint
+ * support.
+ *
+ * Example:
+ *
+ *   const mask = new BasicElement("mask", { id: "someMask" });
+ */
+export default class BasicElement extends Nestable implements Renderable {
+  private tag_: string;
+  private attributes_: Attributes;
+
+  constructor(tag: string, attributes: Attributes = {}) {
+    super();
     this.tag_ = tag;
     this.attributes_ = attributes;
-    this.children_ = [];
-  }
-
-  append(...children) {
-    appendTo(this.children_, children);
-    return this;
-  }
-  prepend(...children) {
-    prependTo(this.children_, children);
-    return this;
-  }
-  insertAt(index, ...children) {
-    insertAt(this.children_, index, children);
-    return this;
-  }
-  insertBefore(child, ...children) {
-    insertBefore(this.children_, child, children);
-    return this;
-  }
-  insertAfter(child, ...children) {
-    insertAfter(this.children_, child, children);
-    return this;
   }
 
   render() {
