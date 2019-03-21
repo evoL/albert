@@ -1,6 +1,6 @@
 {
   "name": "albert-svg",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Dynamic SVG generation using Cassowary constraints",
   "repository": "evoL/albert",
   "main": "dist/albert.js",
