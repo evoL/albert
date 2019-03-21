@@ -429,7 +429,7 @@ export default class TextTable {
     const betweenRows = [];
     for (let y = 1; y < this.rows_.length; y++) {
       betweenRows.push(
-        geq(
+        eq(
           expression(this.rowLeaders_[y].topEdge).minus(
             this.rowLeaders_[y - 1].bottomEdge
           ),
@@ -442,7 +442,7 @@ export default class TextTable {
     const betweenColumns = [];
     for (let x = 1; x < this.columnCount_; x++) {
       betweenColumns.push(
-        geq(
+        eq(
           expression(this.columnLeaders_[x].leftEdge).minus(
             this.columnLeaders_[x - 1].rightEdge
           ),
