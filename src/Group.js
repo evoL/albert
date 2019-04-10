@@ -19,7 +19,7 @@ import {
   LEQ,
   Strength,
   Inequality
-} from "cassowary";
+} from "cassowary-ts";
 import {
   alignAll,
   distribute,

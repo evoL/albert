@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import BasicElement from "./BasicElement";
-import { Expression } from "cassowary";
+import { Expression } from "cassowary-ts";
 import { omit } from "./utils";
 import { variable } from "./helpers";
 

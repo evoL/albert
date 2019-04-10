@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AbstractVariable, Expression } from "cassowary";
+import { AbstractVariable, Expression } from "cassowary-ts";
 import { variable } from "./helpers";
 
 export default class Point {

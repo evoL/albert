@@ -21,7 +21,7 @@ import {
   SimplexSolver,
   Strength,
   Variable
-} from "cassowary";
+} from "cassowary-ts";
 import {
   appendTo,
   castArray,

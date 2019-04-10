@@ -6,7 +6,7 @@
   "main": "dist/albert.js",
   "module": "src/index.js",
   "dependencies": {
-    "cassowary": "0.0.2"
+    "cassowary-ts": "^1.0.9"
   },
   "devDependencies": {
     "ts-loader": "^5.3.3",

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Expression } from "cassowary";
+import { Expression } from "cassowary-ts";
 import { createElement, omit, withTemporarySvg } from "./utils";
 import { variable } from "./helpers";
 

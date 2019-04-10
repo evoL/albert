@@ -23,7 +23,7 @@ import {
   StayConstraint,
   Strength,
   Variable
-} from "cassowary";
+} from "cassowary-ts";
 import {
   arePointLike,
   castArray,
