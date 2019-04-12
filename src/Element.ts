@@ -22,10 +22,10 @@ export default class Element extends BasicElement {
 
     const idPrefix = attributes.id ? attributes.id + ":" : "";
 
-    this.x = variable(idPrefix + "x", attributes.x);
-    this.y = variable(idPrefix + "y", attributes.y);
-    this.width = variable(idPrefix + "width", attributes.width);
-    this.height = variable(idPrefix + "height", attributes.height);
+    this.x = variable(idPrefix + "x", attributes.x as number);
+    this.y = variable(idPrefix + "y", attributes.y as number);
+    this.width = variable(idPrefix + "width", attributes.width as number);
+    this.height = variable(idPrefix + "height", attributes.height as number);
 
     this.leftEdge = new Expression(this.x);
     this.topEdge = new Expression(this.y);

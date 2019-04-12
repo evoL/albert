@@ -1,8 +1,8 @@
 import Renderable from './Renderable';
 import Attributes from './Attributes';
-import { omit, createElement, last } from './utils';
+import { omit, createElement } from './utils';
 import { Variable, Expression } from 'cassowary-ts';
-import { variable } from './helpers';
+import { variable, expression } from './helpers';
 
 
 export default class Circle implements Renderable {
@@ -28,9 +28,9 @@ export default class Circle implements Renderable {
 
     const idPrefix = attributes.id ? attributes.id + ":" : "";
 
-    this.cx = variable(idPrefix + "circle.cx", attributes.cx);
-    this.cy = variable(idPrefix + "circle.cy", attributes.cy);
-    this.r = variable(idPrefix + "circle.r", attributes.r);
+    this.cx = variable(idPrefix + "circle.cx", attributes.cx as number);
+    this.cy = variable(idPrefix + "circle.cy", attributes.cy as number);
+    this.r = variable(idPrefix + "circle.r", attributes.r as number);
 
     this.centerX = expression(this.cx);
     this.centerY = expression(this.cy);

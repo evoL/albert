@@ -55,13 +55,13 @@ export default class Filter {
     return this;
   }
 
-  addComposite(in1: SVGAnimatedString, in2: SVGAnimatedString, attributes: Attributes = {}) { // REVIEW
+  addComposite(in1: any, in2: any, attributes: Attributes = {}) { // REVIEW
     const allAttributes = {in: in1, in2, ...attributes};
     this.filters_.push(createFilterNode("feComposite", allAttributes));
     return this;
   }
 
-  addColorMatrix(type: SVGAnimatedEnumeration, valueOrAttributes: string | number | Attributes = {}, attributes: Attributes = {}) {
+  addColorMatrix(type: any, valueOrAttributes: string | number | Attributes = {}, attributes: Attributes = {}) {
     const colorMatrixAttributes: { type: SVGAnimatedEnumeration, [key: string]: any } = { type };
     if (["string", "number"].includes(typeof valueOrAttributes)) {
       colorMatrixAttributes.values = valueOrAttributes;

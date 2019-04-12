@@ -16,6 +16,7 @@
  * Represents an SVG element within Albert.
  */
 export default interface Renderable {
+
   /** Renders the Renderable to a DOM element. */
   render(): Element;
 }

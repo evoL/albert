@@ -16,7 +16,7 @@ export { default as BasicElement } from "./BasicElement";
 export { default as Circle } from "./Circle";
 export { default as Element } from "./Element";
 export { default as Filter } from "./Filter";
-export { default as FormattedText } from "./FormattedText";
+// export { default as FormattedText } from "./FormattedText";
 export { default as Group } from "./Group";
 export { default as Image } from "./Image";
 export { default as Line } from "./Line";

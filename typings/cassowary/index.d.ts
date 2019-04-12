@@ -47,15 +47,15 @@ declare module "cassowary-ts" {
       toString(): string;
   }
   export class EditConstraint extends AbstractConstraint {
-      variable: Variable;
+      variable: AbstractVariable;
       isEdit: boolean;
-      constructor(cv: Variable, strength: Strength, weight?: number);
+      constructor(cv: AbstractVariable, strength: Strength, weight?: number);
       toString(): string;
   }
   export class StayConstraint extends AbstractConstraint {
-      variable: Variable;
+      variable: AbstractVariable;
       isStay: boolean;
-      constructor(cv: Variable, strength: Strength, weight: number);
+      constructor(cv: AbstractVariable, strength: Strength, weight: number);
       toString(): string;
   }
   export class Constraint extends AbstractConstraint {
@@ -66,7 +66,7 @@ declare module "cassowary-ts" {
       toString(): string;
   }
   export class Equation extends Constraint {
-      constructor(a1: any, a2: any, a3: any, a4: any);
+      constructor(a1: any, a2: any, a3?: any, a4?: any);
       toString(): string;
   }
 
