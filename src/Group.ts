@@ -1,48 +1,37 @@
-// Copyright 2019 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+import Nestable from './Nestable';
+import Attributes from './Attributes';
+import { Constraint, Variable, Expression, LEQ, GEQ, Inequality, Strength, Equation } from 'cassowary-ts';
+import Element from './Element';
+import { variable, forEach, fixAll, eqAll, alignAll, leqAll, distribute, spaceHorizontally, spaceVertically, geqAll } from './helpers';
+import { createElement, appendTo } from './utils';
+import Renderable from './Renderable';
 
-import {
-  Equation,
-  Expression,
-  GEQ,
-  LEQ,
-  Strength,
-  Inequality
-} from "cassowary-ts";
-import {
-  alignAll,
-  distribute,
-  eqAll,
-  geqAll,
-  fixAll,
-  forEach,
-  leqAll,
-  spaceHorizontally,
-  spaceVertically,
-  variable
-} from "./helpers";
-import {
-  appendTo,
-  createElement,
-  insertAfter,
-  insertAt,
-  insertBefore,
-  prependTo
-} from "./utils";
 
-export default class Group {
-  constructor(childrenOrAttributes = {}, attributes = {}) {
+export default class Group extends Nestable implements Renderable {
+
+  private attributes_: Attributes;
+  private constraints_: Constraint[];
+
+  private topMostChild_: Element;
+  private bottomMostChild_: Element;
+  private leftMostChild_: Element;
+  private rightMostChild_: Element;
+
+  public leftEdge: Variable;
+  public topEdge: Variable;
+  public rightEdge: Variable;
+  public bottomEdge: Variable;
+
+  public x: Expression;
+  public y: Expression;
+  public width: Expression;
+  public height: Expression;
+  public centerX: Expression;
+  public centerY: Expression;
+
+  constructor(childrenOrAttributes: any = {}, attributes: Attributes = {}) {
+    super();
+
     if (Array.isArray(childrenOrAttributes)) {
       this.children_ = childrenOrAttributes;
       this.attributes_ = attributes;
@@ -71,42 +60,17 @@ export default class Group {
     this.rightMostChild_ = null;
   }
 
-  append(...children) {
-    appendTo(this.children_, children);
-    return this;
-  }
-
-  prepend(...children) {
-    prependTo(this.children_, children);
-    return this;
-  }
-
-  insertAt(index, ...children) {
-    insertAt(this.children_, index, children);
-    return this;
-  }
-
-  insertBefore(child, ...children) {
-    insertBefore(this.children_, child, children);
-    return this;
-  }
-
-  insertAfter(child, ...children) {
-    insertAfter(this.children_, child, children);
-    return this;
-  }
-
   render() {
     const el = createElement("g", this.attributes_);
     for (const child of this.children_) {
       el.appendChild(child.render());
     }
 
-    // For debugging
-    el.setAttributeNS(null, "data-top-edge", this.topEdge.value);
-    el.setAttributeNS(null, "data-right-edge", this.rightEdge.value);
-    el.setAttributeNS(null, "data-bottom-edge", this.bottomEdge.value);
-    el.setAttributeNS(null, "data-left-edge", this.leftEdge.value);
+    // debugging
+    el.setAttributeNS(null, "data-top-edge", this.topEdge.value as string);
+    el.setAttributeNS(null, "data-right-edge", this.rightEdge.value as string);
+    el.setAttributeNS(null, "data-bottom-edge", this.bottomEdge.value as string);
+    el.setAttributeNS(null, "data-left-edge", this.leftEdge.value as string);
 
     return el;
   }
@@ -155,7 +119,8 @@ export default class Group {
       );
     }
 
-    for (const child of this.children_) {
+    // REVIEW - property <x> does not exist on type "Renderable"
+    for (const child of this.children_ as Element[]) {
       if (child !== this.topMostChild_) {
         result.push(
           new Inequality(this.topEdge, LEQ, child.topEdge, Strength.weak, 1)
@@ -186,52 +151,53 @@ export default class Group {
     return result;
   }
 
-  forEach(constraint) {
+  forEach(constraint: Constraint) {
     appendTo(this.constraints_, forEach(this.children_, constraint));
     return this;
   }
 
-  fixAll(getter) {
+  fixAll(getter: () => any) {
     appendTo(this.constraints_, fixAll(this.children_, getter));
     return this;
   }
 
-  alignAll(getter, distance = undefined) {
+  alignAll(getter: () => any, distance: number = undefined) {
     appendTo(this.constraints_, alignAll(this.children_, getter, distance));
-    return this;
   }
 
-  eqAll(getter) {
+  eqAll(getter: () => any) {
     appendTo(this.constraints_, eqAll(this.children_, getter));
     return this;
   }
 
-  geqAll(getter) {
+  geqAll(getter: () => any) {
     appendTo(this.constraints_, geqAll(this.children_, getter));
     return this;
   }
 
-  leqAll(getter) {
+  leqAll(getter: () => any) {
     appendTo(this.constraints_, leqAll(this.children_, getter));
     return this;
   }
 
-  distribute(getter) {
+  distribute(getter: () => any) {
     appendTo(this.constraints_, distribute(this.children_, getter));
     return this;
   }
 
+  // REVIEW not sure what you'd like to do here
   spaceHorizontally(distance = 0) {
-    this.leftMostChild_ = this.children_[0];
-    this.rightMostChild_ = this.children_[this.children_.length - 1];
+    this.leftMostChild_ = this.children_[0] as Element;
+    this.rightMostChild_ = this.children_[this.children_.length - 1] as Element;
 
     appendTo(this.constraints_, spaceHorizontally(this.children_, distance));
     return this;
   }
 
+  // REVIEW or here... maybe casting to Element with "as Element" ...?
   spaceVertically(distance = 0) {
-    this.topMostChild_ = this.children_[0];
-    this.bottomMostChild_ = this.children_[this.children_.length - 1];
+    this.topMostChild_ = this.children_[0] as Element;
+    this.bottomMostChild_ = this.children_[this.children_.length - 1] as Element;
 
     appendTo(this.constraints_, spaceVertically(this.children_, distance));
     return this;

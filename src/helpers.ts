@@ -1,64 +1,46 @@
-// Copyright 2019 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-import Point from "./Point";
 import {
-  AbstractVariable,
-  Equation,
   Expression,
-  GEQ,
-  Inequality,
-  LEQ,
-  StayConstraint,
+  Variable,
+  AbstractVariable,
+  Constraint,
   Strength,
-  Variable
+  Equation,
+  LEQ,
+  Inequality,
+  GEQ,
+  StayConstraint
 } from "cassowary-ts";
-import {
-  arePointLike,
-  castArray,
-  identity,
-  isPointLike,
-  uniqueId
-} from "./utils";
+import { uniqueId, castArray, arePointLike, identity, isPointLike } from './utils';
+import Point from "./Point";
+import Element from "./Element";
 
-export function expression(something) {
-  return something instanceof Expression
-    ? something
-    : new Expression(something);
+export function expression(something: any) {
+  return something instanceof Expression ? something : new Expression(something);
 }
 
-export function variable(name, value = undefined) {
+export function variable(name: string, value: number = undefined) {
   return new Variable({ name: uniqueId(name), value });
 }
 
-export function point(p = undefined, y = undefined) {
-  if (p instanceof Point) {
-    return p;
-  }
-  if (Array.isArray(p)) {
-    return Point.fromPair(p);
-  }
+type varOrNum = AbstractVariable | number;
+
+export function point(
+  p: Point | [varOrNum, varOrNum] | varOrNum = undefined,
+  y: varOrNum = undefined
+) {
+  if (p instanceof Point) return p;
+  if (Array.isArray(p)) return Point.fromPair(p);
   if (
     (typeof p === "number" || p instanceof AbstractVariable) &&
     y !== undefined
   ) {
     return new Point(p, y);
   }
+
   return new Point(0, 0);
 }
 
-export function between(a, b, percentage) {
+export function between(a: Element, b: Element, percentage: number) {
   const ax = expression(a.x);
   const ay = expression(a.y);
   const bx = expression(b.x);
@@ -67,20 +49,20 @@ export function between(a, b, percentage) {
   return {
     x: ax.plus(bx.minus(ax).times(percentage)),
     y: ay.plus(by.minus(ay).times(percentage))
-  };
+  }
 }
 
-export function center(a, b) {
+export function center(a: Element, b: Element) {
   const ax = expression(a.x);
   const ay = expression(a.y);
 
   return {
     x: ax.plus(b.x).divide(2),
     y: ay.plus(b.y).divide(2)
-  };
+  }
 }
 
-function makeDistanceGetter(distance, method = "") {
+function makeDistanceGetter(distance: number | (() => any) | Expression | AbstractVariable, method = ""): (...args: any[]) => any {
   if (
     typeof distance === "number" ||
     distance instanceof AbstractVariable ||
@@ -92,12 +74,12 @@ function makeDistanceGetter(distance, method = "") {
   } else {
     const prefix = method.length ? `${method}: ` : "";
     throw new Error(
-      prefix + "distance must be a number, function, variable or expression"
+      prefix + "distance must be a number, function, variable, or expression"
     );
   }
 }
 
-export function negative(something) {
+export function negative(something: number | AbstractVariable | Expression) {
   if (typeof something === "number") {
     return -something;
   } else if (something instanceof AbstractVariable) {
@@ -109,22 +91,23 @@ export function negative(something) {
   }
 }
 
-export function forEach(array, constraint) {
+// REVIEW may not be an actual constraint class
+export function forEach(array: any[], constraint: Constraint | any) {
   return array.reduce(
     (result, item, index, arr) =>
       result.concat(castArray(constraint(item, index, arr))),
     []
-  );
+  )
 }
 
-export function eq(a, b) {
+export function eq(a: any, b: any) {
   if (arePointLike(a, b)) {
-    return [eq(a.x, b.x), eq(a.y, b.y)];
+    return [eq(a.x, b.x), eq(a.y, b.y)]
   }
   return new Equation(a, b, Strength.weak, 1);
 }
 
-export function eqAll(array, getter) {
+export function eqAll(array: any[], getter: Function) {
   const constraints = [];
   for (let i = 1; i < array.length; i++) {
     constraints.push(eq(getter(array[i - 1]), getter(array[i])));
@@ -132,11 +115,14 @@ export function eqAll(array, getter) {
   return constraints;
 }
 
-export function leq(a, b) {
+export function leq(
+  a: number | Expression | AbstractVariable,
+  b: number | Expression | AbstractVariable
+) {
   return new Inequality(a, LEQ, b, Strength.weak, 1);
 }
 
-export function leqAll(array, getter) {
+export function leqAll(array: any[], getter: Function) {
   const constraints = [];
   for (let i = 1; i < array.length; i++) {
     constraints.push(leq(getter(array[i - 1]), getter(array[i])));
@@ -144,23 +130,27 @@ export function leqAll(array, getter) {
   return constraints;
 }
 
-export function geq(a, b) {
+export function geq(
+  a: number | Expression | AbstractVariable,
+  b: number | Expression | AbstractVariable
+) {
   return new Inequality(a, GEQ, b, Strength.weak, 1);
 }
 
-export function geqAll(array, getter) {
+// REVIEW possibly redundant...?
+export function geqAll(array: any[], getter: Function) {
   const constraints = [];
   for (let i = 1; i < array.length; i++) {
-    constraints.push(geq(getter(array[i - 1]), getter(array[i])));
+    constraints.push(leq(getter(array[i - 1]), getter(array[i])));
   }
   return constraints;
 }
 
-function makeStay(variable) {
+export function makeStay(variable: any) {
   return new StayConstraint(variable, Strength.weak, 1);
 }
 
-export function fix(...vars) {
+export function fix(...vars: any[]) {
   return vars.reduce(
     (constraints, variable) =>
       constraints.concat(
@@ -172,14 +162,15 @@ export function fix(...vars) {
   );
 }
 
-export function fixAll(array, getter = identity) {
+export function fixAll(array: any[], getter = identity) {
   return fix(...array.map(getter));
 }
 
-export function align(a, b, distance = 0, strength = Strength.weak) {
+export function align(a: any, b: any, distance = 0, strength = Strength.weak) {
   if (arePointLike(a, b)) {
     const distanceObj = isPointLike(distance)
-      ? distance
+        // because typescript is silly sometimes
+      ? distance as unknown as { x: number; y: number; }
       : { x: distance, y: distance };
     return [
       align(a.x, b.x, distanceObj.x, strength),
@@ -189,14 +180,13 @@ export function align(a, b, distance = 0, strength = Strength.weak) {
 
   const aExpression = expression(a);
 
-  // a - distance = b => a - b = distance
   const leftSide = aExpression.minus(b);
   return new Equation(leftSide, distance, strength);
 }
 
 export function fill(
-  a,
-  b,
+  a: any,
+  b: any,
   offsetXOrBoth = 0,
   offsetY = undefined,
   strength = Strength.weak
@@ -213,9 +203,9 @@ export function fill(
   ];
 }
 
-export function alignAll(array, getter, distance = 0) {
+export function alignAll(array: any[], getter: (...args: any[]) => any, distance = 0) {
   const constraints = [];
-  const distanceGetter = makeDistanceGetter(distance, "alignAll");
+  const distanceGetter: Function = makeDistanceGetter(distance, "alignAll");
 
   for (let i = 1; i < array.length; i++) {
     constraints.push(
@@ -229,7 +219,7 @@ export function alignAll(array, getter, distance = 0) {
   return constraints;
 }
 
-export function distribute(array, getter) {
+export function distribute(array: any[], getter: (...args: any[]) => any ) {
   const constraints = [];
   const attributes = array.map(getter);
 
@@ -257,7 +247,7 @@ export function spaceHorizontally(array, distance = 0) {
       align(
         array[i - 1].rightEdge,
         array[i].leftEdge,
-        negative(distanceGetter(array[i - 1]))
+        negative(distanceGetter(array[i - 1])) as number // REVIEW might not always be the case?
       )
     );
   }
@@ -272,7 +262,7 @@ export function spaceVertically(array, distance = 0) {
       align(
         array[i - 1].bottomEdge,
         array[i].topEdge,
-        negative(distanceGetter(array[i - 1]))
+        negative(distanceGetter(array[i - 1])) as number // REVIEW see above
       )
     );
   }

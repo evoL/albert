@@ -1,3 +1,4 @@
+import { SVGAElementAttributes } from 'svg';
 // Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +29,7 @@ export function castArray<T>(thing: T | Array<T>): Array<T> {
 /** Returns a shallow copy of the object with the passed in keys removed. */
 export function omit<T>(
   object: { [key: string]: T },
-  keys: Array<keyof object>
+  keys: Array<keyof object | string>
 ): { [key: string]: T } {
   const obj = Object.assign({}, object);
   for (const key of keys) {

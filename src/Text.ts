@@ -1,37 +1,45 @@
-// Copyright 2019 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-import { Expression } from "cassowary-ts";
-import { createElement, omit, withTemporarySvg } from "./utils";
+import Attributes from "./Attributes";
+import Renderable from "./Renderable";
+import { omit, createElement, withTemporarySvg } from "./utils";
 import { variable } from "./helpers";
+import { Expression, Variable } from "cassowary-ts";
+import Element from "./Element";
 
-function createSlice(start, end, attributes) {
+
+function createSlice(start: number, end: number, attributes: Attributes) {
   return { start, end, attributes };
 }
 
-export default class Text {
-  constructor(text, attributes = {}) {
+export default class Text implements Renderable {
+  private text_: string;
+  private attributes_: Attributes;
+  private slices_: any[];
+
+  public x: Variable;
+  public y: Variable;
+  public fontSize: Variable;
+  public ratios: any;
+  public width = null;
+  public height = null;
+  public leftEdge = null;
+  public topEdge = null;
+  public rightEdge = null;
+  public bottomEdge = null;
+  public centerX = null;
+  public centerY = null;
+  public baseline: Expression;
+
+  constructor(text: string, attributes: Attributes = {}) {
     this.text_ = text;
     this.attributes_ = omit(attributes, ["x", "y", "font-size"]);
-    this.slices_ = []; // By default there will be no spans
+    this.slices_ = [];
 
     const idPrefix = attributes.id ? attributes.id + ":" : "";
-    this.x = variable(idPrefix + "text.x", attributes.x);
-    this.y = variable(idPrefix + "text.y", attributes.y);
+    this.x = variable(idPrefix + "text.x", attributes.x as number);
+    this.y = variable(idPrefix + "text.y", attributes.y as number);
     this.fontSize = variable(
       idPrefix + "text.fontSize",
-      attributes["font-size"] || 16
+      (attributes["font-size"] as number) || 16
     );
 
     this.ratios = {
@@ -40,21 +48,13 @@ export default class Text {
       left: 0,
       top: 0,
       bottom: 0
-    };
-    this.width = null;
-    this.height = null;
-    this.leftEdge = null;
-    this.topEdge = null;
-    this.rightEdge = null;
-    this.bottomEdge = null;
-    this.centerX = null;
-    this.centerY = null;
+    }
     this.baseline = new Expression(this.y);
 
     this.adjustDimensions_();
   }
 
-  setAttributes(attributes) {
+  setAttributes(attributes: Attributes) {
     Object.assign(this.attributes_, omit(attributes, ["x", "y", "font-size"]));
 
     if (Object.keys(attributes).some(attr => attr.startsWith("font"))) {
@@ -64,7 +64,7 @@ export default class Text {
     return this;
   }
 
-  setText(text) {
+  setText(text: string) {
     this.text_ = text;
     this.slices_ = [];
     this.adjustDimensions_();
@@ -75,7 +75,7 @@ export default class Text {
     return new Expression(this.fontSize).times(multiplier);
   }
 
-  format(start, end, attributes = {}) {
+  format(start: number, end: number, attributes: Attributes = {}) {
     if (start >= end) {
       throw new Error(
         `Invalid start or end passed to Text.format(): (${start}, ${end})`
@@ -89,7 +89,7 @@ export default class Text {
     }
     if (
       "font-size" in attributes &&
-      !/(%|em|ex|ch)$/.test(attributes["font-size"])
+      !/(%|em|ex|ch)$/.test(attributes["font-size"] as string)
     ) {
       throw new Error(
         "Changing the font-size is only supported for relative units (%, em, ex, ch)"
@@ -152,7 +152,7 @@ export default class Text {
     return this;
   }
 
-  formatRegexp(regexp, attributes = {}) {
+  formatRegexp(regexp: RegExp | string, attributes = {}) {
     if (typeof regexp === "string") {
       regexp = new RegExp(regexp);
     }
@@ -174,14 +174,14 @@ export default class Text {
       el.appendChild(document.createTextNode(this.text_));
     }
 
-    el.setAttributeNS(null, "x", this.x.value);
-    el.setAttributeNS(null, "y", this.y.value);
-    el.setAttributeNS(null, "font-size", this.fontSize.value);
+    el.setAttributeNS(null, "x", this.x.value as string);
+    el.setAttributeNS(null, "y", this.y.value as string);
+    el.setAttributeNS(null, "font-size", this.fontSize.value as string);
 
     return el;
   }
 
-  renderSlices_(el) {
+  private renderSlices_(el: any) {
     let position = 0;
     for (const { start, end, attributes } of this.slices_) {
       if (position < start) {
@@ -202,15 +202,15 @@ export default class Text {
     }
   }
 
-  adjustDimensions_() {
+  /* private */ adjustDimensions_() {
     const el = this.render();
-    withTemporarySvg(el, text => {
+    withTemporarySvg(el, (text: any) => {
       const bbox = text.getBBox();
 
-      const widthRatio = bbox.width / this.fontSize.value;
-      const heightRatio = bbox.height / this.fontSize.value;
-      const leftEdgeRatio = (this.x.value - bbox.x) / this.fontSize.value;
-      const topEdgeRatio = (this.y.value - bbox.y) / this.fontSize.value;
+      const widthRatio = bbox.width / (this.fontSize.value as number);
+      const heightRatio = bbox.height / (this.fontSize.value as number);
+      const leftEdgeRatio = ((this.x.value as number) - bbox.x) / (this.fontSize.value as number);
+      const topEdgeRatio = ((this.y.value as number) - bbox.y) / (this.fontSize.value as number);
 
       this.width = new Expression(this.fontSize).times(
         new Expression(widthRatio)
@@ -234,7 +234,7 @@ export default class Text {
         height: heightRatio,
         left: leftEdgeRatio,
         top: topEdgeRatio,
-        bottom: (bbox.y + bbox.height - this.y.value) / this.fontSize.value
+        bottom: (bbox.y + bbox.height - (this.y.value as number)) / (this.fontSize.value as number)
       };
     });
   }
